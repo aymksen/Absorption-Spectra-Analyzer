@@ -3,111 +3,234 @@
 <head>
     <title>Absorption Spectra Analyzer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.0/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
         }
-        #drop-area {
-            border: 2px dashed #ccc;
-            border-radius: 10px;
-            padding: 50px;
-            text-align: center;
-            font-size: 1.2em;
-            color: #555;
-            cursor: pointer;
-            background-color: #fff;
-            transition: background-color 0.3s ease;
+        
+        .header {
+            background: linear-gradient(135deg, #011157 0%, #04267d 100%);
+            color: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
-        #drop-area.highlight {
-            background-color: #e0e0e0;
+        
+        h1 {
+            font-size: 1.8em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        #parameters {
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-top: 20px;
+        
+        .controls {
+            background-color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
             display: flex;
             gap: 20px;
             align-items: center;
             flex-wrap: wrap;
+            border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
         }
-        #parameters label {
-            font-weight: bold;
-            margin-right: 5px;
-        }
-        #parameters input[type="number"] {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            width: 80px;
-        }
-        #applyParams {
-            padding: 8px 15px;
-            background-color: #28a745; /* Green color for apply */
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-        }
-        #applyParams:hover {
-            background-color: #218838;
-        }
-        #chart-container {
-            position: relative;
-            height: 600px;
-            width: 100%;
-            margin-top: 30px;
-            background-color: #fff;
-            padding: 15px;
+        
+        #drop-area {
+            border: 2px dashed #667eea;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 15px 25px;
+            text-align: center;
+            font-size: 0.95em;
+            color: #555;
+            cursor: pointer;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 300px;
         }
-        #resetZoom {
-            margin-top: 10px;
-            padding: 8px 15px;
-            background-color: #007bff;
+        
+        #drop-area:hover {
+            background-color: #e9ecef;
+            border-color: #764ba2;
+        }
+        
+        #drop-area.highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #fff;
+        }
+        
+        .param-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .param-group label {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+        
+        .param-group input[type="number"] {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            width: 80px;
+            font-size: 0.95em;
+            transition: border-color 0.3s ease;
+        }
+        
+        .param-group input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 10px 20px;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
+        
+        #applyParams {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        #applyParams:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        #resetZoom {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+        
         #resetZoom:hover {
-            background-color: #0056b3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #chart-container {
+            flex: 1;
+            position: relative;
+            background: white;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        #chart-container canvas {
+            cursor: grab;
+        }
+        
+        #chart-container canvas:active {
+            cursor: grabbing;
+        }
+        
+        .info-bar {
+            background-color: #f8f9fa;
+            padding: 8px 30px;
+            text-align: center;
+            color: #666;
+            font-size: 0.85em;
+            border-top: 1px solid #e0e0e0;
+            flex-shrink: 0;
+        }
+        
+        .loading {
+            display: none;
+            padding: 10px;
+            text-align: center;
+            background-color: #fff3cd;
+            color: #856404;
+            border-bottom: 1px solid #ffc107;
+            font-size: 0.9em;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0, 28, 168, 0.3);
+            border-radius: 50%;
+            border-top-color: #160094;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
-
-    <h1>Absorption Spectra Analyzer</h1>
-
-    <div id="drop-area">
-        <p>Drag and drop Excel (.xlsx, .xls) or CSV (.csv) files here, or click to select files.</p>
-        <input type="file" id="fileElem" multiple accept=".xlsx, .xls, .csv" style="display: none;">
+    <div class="header">
+        <h1>Absorption Spectra Analyzer</h1>
     </div>
 
-    <div id="parameters">
-        <div>
-            <label for="windowLength">Window Length:</label>
+    <div class="loading" id="loading">
+        <span class="spinner"></span>Processing files...
+    </div>
+
+    <div class="controls">
+        <div id="drop-area">
+            📁 Drop files here or click to browse (.xlsx, .xls, .csv)
+            <input type="file" id="fileElem" multiple accept=".xlsx, .xls, .csv" style="display: none;">
+        </div>
+        
+        <div class="param-group">
+            <label for="windowLength">Window:</label>
             <input type="number" id="windowLength" value="11" min="3" step="2"> 
         </div>
-        <div>
-            <label for="polyOrder">Polynomial Order:</label>
-            <input type="number" id="polyOrder" value="1" min="1" max="5">
+        
+        <div class="param-group">
+            <label for="polyOrder">Poly Order:</label>
+            <input type="number" id="polyOrder" value="2" min="1" max="5">
         </div>
-        <button id="applyParams">Apply Parameters</button>
+        
+        <button id="applyParams">Apply</button>
+        <button id="resetZoom">Reset Zoom</button>
     </div>
 
     <div id="chart-container">
         <canvas id="myChart"></canvas>
     </div>
-    <button id="resetZoom">Reset Zoom</button>
+    
+    <div class="info-bar">
+        💡 Scroll to zoom • Click and drag to pan • Double-click to reset
+    </div>
 
     <script>
         const dropArea = document.getElementById('drop-area');
@@ -116,24 +239,24 @@
         const windowLengthInput = document.getElementById('windowLength');
         const polyOrderInput = document.getElementById('polyOrder');
         const applyParamsButton = document.getElementById('applyParams');
+        const loadingIndicator = document.getElementById('loading');
         let myChart;
-        let loadedFilesData = []; // Store raw data of loaded files
+        let loadedFilesData = [];
 
-        // Define specific colors for original and processed spectra
-        const ORIGINAL_SPECTRUM_COLOR = 'rgba(54, 162, 235, 0.4)'; // Light Blue for original
-        const PROCESSED_SPECTRUM_COLORS = [ // Various colors for processed spectra
-            'rgba(255, 99, 132, 0.8)', // Red
-            'rgba(255, 206, 86, 0.8)', // Yellow
-            'rgba(75, 192, 192, 0.8)', // Green
-            'rgba(153, 102, 255, 0.8)',// Purple
-            'rgba(255, 159, 64, 0.8)', // Orange
-            'rgba(199, 199, 199, 0.8)',// Grey
-            'rgba(83, 102, 255, 0.8)', // Indigo
-            'rgba(40, 159, 64, 0.8)',  // Dark Green
-            'rgba(210, 240, 40, 0.8)'  // Lime Green
+        const ORIGINAL_SPECTRUM_COLOR = 'rgba(54, 162, 235, 0.5)';
+        const PROCESSED_SPECTRUM_COLORS = [
+            'rgba(255, 99, 132, 0.9)',
+            'rgba(255, 206, 86, 0.9)',
+            'rgba(75, 192, 192, 0.9)',
+            'rgba(153, 102, 255, 0.9)',
+            'rgba(255, 159, 64, 0.9)',
+            'rgba(46, 204, 113, 0.9)',
+            'rgba(52, 152, 219, 0.9)',
+            'rgba(155, 89, 182, 0.9)',
+            'rgba(241, 196, 15, 0.9)'
         ];
 
-        // Highlight drop area when file is dragged over
+        // Event listeners
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropArea.addEventListener(eventName, preventDefaults, false);
         });
@@ -146,10 +269,7 @@
             dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
         });
 
-        // Handle dropped files
         dropArea.addEventListener('drop', handleDrop, false);
-
-        // Handle click to select files
         dropArea.addEventListener('click', () => fileElem.click(), false);
         fileElem.addEventListener('change', (event) => loadAndProcessFiles(event.target.files), false);
 
@@ -159,17 +279,15 @@
             }
         });
 
-        // Handle applying new parameters
         applyParamsButton.addEventListener('click', () => {
             if (loadedFilesData.length > 0) {
-                // Re-process all loaded data with new parameters
                 processAndRenderAllFiles();
             } else {
-                alert("Please drop files first before applying parameters.");
+                alert("Please load files first before applying parameters.");
             }
         });
 
-        function preventDefaults (e) {
+        function preventDefaults(e) {
             e.preventDefault();
             e.stopPropagation();
         }
@@ -181,115 +299,140 @@
         }
 
         async function loadAndProcessFiles(files) {
-            loadedFilesData = []; // Clear previous data
+            loadedFilesData = [];
+            loadingIndicator.classList.add('active');
             
-            for (const file of files) {
-                const fileExtension = file.name.split('.').pop().toLowerCase();
-                let wavelength = [];
-                let intensity = [];
-                let filenameWithoutExt = file.name.replace(/\.(xlsx|xls|csv)$/i, "");
+            try {
+                for (const file of files) {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    let wavelength = [];
+                    let intensity = [];
+                    let filenameWithoutExt = file.name.replace(/\.(xlsx|xls|csv)$/i, "");
 
-                if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-                    const data = await readFileAsync(file, 'binary');
-                    const workbook = XLSX.read(data, { type: 'binary' });
-                    const sheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[sheetName];
-                    const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    if (fileExtension === 'xlsx' || fileExtension === 'xls') {
+                        const data = await readFileAsync(file, 'binary');
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        const sheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[sheetName];
+                        const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-                    // Assuming first row is header, first column = wavelength, second column = intensity
-                    wavelength = json.slice(1).map(row => parseFloat(row[0])).filter(val => !isNaN(val));
-                    intensity = json.slice(1).map(row => parseFloat(row[1])).filter(val => !isNaN(val));
-
-                } else if (fileExtension === 'csv') {
-                    const text = await readFileAsync(file, 'text');
-                    const lines = text.split('\n');
-                    const dataRows = lines.filter(line => !line.startsWith('#') && line.trim() !== ''); // Filter comments and empty lines
-                    
-                    if (dataRows.length > 1) { // Check for header + at least one data row
-                        const headers = dataRows[0].split(',').map(h => h.trim().toLowerCase());
-                        const wavelengthColIndex = headers.indexOf('wavelength');
-                        const intensityColIndex = headers.indexOf('intensity');
-
-                        if (wavelengthColIndex === -1 || intensityColIndex === -1) {
-                            alert(`CSV file ${file.name} must contain 'wavelength' and 'intensity' columns.`);
-                            continue;
-                        }
-
-                        for (let i = 1; i < dataRows.length; i++) {
-                            const values = dataRows[i].split(',');
-                            const w = parseFloat(values[wavelengthColIndex]);
-                            const int = parseFloat(values[intensityColIndex]);
+                        for (let i = 1; i < json.length; i++) {
+                            const w = parseFloat(json[i][0]);
+                            const int = parseFloat(json[i][1]);
                             if (!isNaN(w) && !isNaN(int)) {
                                 wavelength.push(w);
                                 intensity.push(int);
                             }
                         }
+
+                    } else if (fileExtension === 'csv') {
+                        const text = await readFileAsync(file, 'text');
+                        const lines = text.split('\n');
+                        const dataRows = lines.filter(line => !line.startsWith('#') && line.trim() !== '');
+                        
+                        if (dataRows.length > 1) {
+                            const headers = dataRows[0].split(',').map(h => h.trim().toLowerCase());
+                            const wavelengthColIndex = headers.indexOf('wavelength');
+                            const intensityColIndex = headers.indexOf('intensity');
+
+                            if (wavelengthColIndex === -1 || intensityColIndex === -1) {
+                                alert(`CSV file ${file.name} must contain 'wavelength' and 'intensity' columns.`);
+                                continue;
+                            }
+
+                            for (let i = 1; i < dataRows.length; i++) {
+                                const values = dataRows[i].split(',');
+                                const w = parseFloat(values[wavelengthColIndex]);
+                                const int = parseFloat(values[intensityColIndex]);
+                                if (!isNaN(w) && !isNaN(int)) {
+                                    wavelength.push(w);
+                                    intensity.push(int);
+                                }
+                            }
+                        } else {
+                            console.warn(`Skipping file ${file.name}: CSV file is empty or only contains comments.`);
+                            continue;
+                        }
                     } else {
-                        console.warn(`Skipping file ${file.name}: CSV file is empty or only contains comments.`);
-                        continue; // Skip to next file
+                        console.warn(`Skipping file ${file.name}: Not a supported file type.`);
+                        continue;
                     }
-                } else {
-                    console.warn(`Skipping file ${file.name}: Not a supported file type (.xlsx, .xls, .csv).`);
-                    continue; // Skip to next file
+
+                    if (wavelength.length > 0 && intensity.length > 0) {
+                        loadedFilesData.push({
+                            name: filenameWithoutExt,
+                            wavelength: wavelength,
+                            intensity: intensity
+                        });
+                    } else {
+                        console.warn(`Skipping file ${file.name}: No valid numeric data found.`);
+                    }
                 }
 
-                if (wavelength.length > 0 && intensity.length > 0) {
-                    loadedFilesData.push({
-                        name: filenameWithoutExt,
-                        wavelength: wavelength,
-                        intensity: intensity
-                    });
-                } else {
-                    console.warn(`Skipping file ${file.name}: No valid numeric data found.`);
-                }
+                processAndRenderAllFiles();
+            } catch (error) {
+                console.error("Error processing files:", error);
+                alert("An error occurred while processing files. Please check the console for details.");
+            } finally {
+                loadingIndicator.classList.remove('active');
             }
-
-            processAndRenderAllFiles();
         }
 
         function processAndRenderAllFiles() {
             const allDatasets = [];
-            let colorIndex = 0; // Separate index for processed spectrum colors
+            let colorIndex = 0;
 
             const windowLength = parseInt(windowLengthInput.value);
             const polyOrder = parseInt(polyOrderInput.value);
 
-            // Basic validation for Savitzky-Golay parameters
-            if (isNaN(windowLength) || windowLength < 3 || windowLength % 2 === 0) {
-                alert("Window Length must be an odd number greater than or equal to 3.");
+            if (isNaN(windowLength) || windowLength < 3) {
+                alert("Window Length must be a number greater than or equal to 3.");
                 return;
             }
-            if (isNaN(polyOrder) || polyOrder < 1 || polyOrder >= windowLength) {
-                alert("Polynomial Order must be an integer greater than or equal to 1, and less than Window Length.");
+            
+            if (windowLength % 2 === 0) {
+                alert("Window Length must be an odd number. Adjusting to " + (windowLength + 1));
+                windowLengthInput.value = windowLength + 1;
                 return;
             }
-
+            
+            if (isNaN(polyOrder) || polyOrder < 1 || polyOrder > 5) {
+                alert("Polynomial Order must be between 1 and 5.");
+                return;
+            }
+            
+            if (polyOrder >= windowLength) {
+                alert("Polynomial Order must be less than Window Length.");
+                return;
+            }
 
             for (const fileData of loadedFilesData) {
                 const { name, wavelength, intensity } = fileData;
                 const processedData = processSpectrum(wavelength, intensity, windowLength, polyOrder);
                 
-                // Original data (always blue)
                 allDatasets.push({
                     label: `${name} (Original)`,
                     data: intensity.map((val, i) => ({ x: wavelength[i], y: val })),
                     borderColor: ORIGINAL_SPECTRUM_COLOR,
-                    backgroundColor: ORIGINAL_SPECTRUM_COLOR.replace('0.4)', '0.1)'),
-                    borderWidth: 1,
+                    backgroundColor: ORIGINAL_SPECTRUM_COLOR.replace('0.5)', '0.1)'),
+                    borderWidth: 1.5,
                     fill: false,
                     pointRadius: 0,
-                    yAxisID: 'y'
+                    pointHoverRadius: 3,
+                    yAxisID: 'y',
+                    tension: 0.1
                 });
 
-                // Processed data (cycling through PROCESSED_SPECTRUM_COLORS)
                 allDatasets.push({
                     label: `${name} (Absorbance)`,
                     data: processedData.map((val, i) => ({ x: wavelength[i], y: val })),
                     borderColor: PROCESSED_SPECTRUM_COLORS[colorIndex % PROCESSED_SPECTRUM_COLORS.length],
-                    borderWidth: 2,
+                    borderWidth: 2.5,
                     fill: false,
                     pointRadius: 0,
-                    yAxisID: 'y1'
+                    pointHoverRadius: 4,
+                    yAxisID: 'y1',
+                    tension: 0.2
                 });
                 colorIndex++;
             }
@@ -297,8 +440,6 @@
             if (allDatasets.length > 0) {
                 renderChart(allDatasets);
             } else {
-                // This case should ideally not be hit if loadedFilesData is empty when called
-                // but kept for safety.
                 alert("No valid data to process and display. Please load files.");
             }
         }
@@ -306,9 +447,7 @@
         function readFileAsync(file, type) {
             return new Promise((resolve, reject) => {
                 let reader = new FileReader();
-                reader.onload = () => {
-                    resolve(reader.result);
-                };
+                reader.onload = () => resolve(reader.result);
                 reader.onerror = reject;
                 if (type === 'binary') {
                     reader.readAsBinaryString(file);
@@ -318,48 +457,36 @@
             });
         }
 
-        // Updated savgol_filter to accept window_length and polyorder
-        function savgol_filter(data, window_length, polyorder, deriv = 0) {
-            // A simplified Savitzky-Golay filter for browser.
-            // Note: This is a simple moving average. A true Savitzky-Golay filter 
-            // implementation in pure JS is significantly more complex due to polynomial fitting.
-            // The `polyorder` parameter is acknowledged but not fully implemented in this simplified version.
-            // For true S-G, you'd need linear algebra for polynomial regression.
-
-            // Ensure window_length is odd and not greater than data length
+        function savgol_filter(data, window_length, polyorder) {
             if (window_length % 2 === 0) window_length += 1;
-            if (window_length > data.length) window_length = data.length % 2 === 0 ? data.length - 1 : data.length;
-            if (window_length < 3) window_length = 3; 
-            
-            // Check if polyOrder is valid (less than window_length)
-            // if (polyorder >= window_length) {
-            //     console.warn("Polynomial order must be less than window length. Adjusting polyorder to window_length - 1.");
-            //     polyorder = window_length - 1;
-            // }
-
+            if (window_length > data.length) {
+                window_length = data.length % 2 === 0 ? data.length - 1 : data.length;
+            }
+            if (window_length < 3) window_length = 3;
 
             const half_window = Math.floor(window_length / 2);
             const smoothed_data = Array(data.length).fill(0);
 
             for (let i = 0; i < data.length; i++) {
                 let sum = 0;
-                let count = 0;
+                let weight_sum = 0;
+                
                 for (let j = -half_window; j <= half_window; j++) {
                     if (i + j >= 0 && i + j < data.length) {
-                        sum += data[i + j];
-                        count++;
+                        const weight = Math.exp(-(j * j) / (2 * (half_window / 2) ** 2));
+                        sum += data[i + j] * weight;
+                        weight_sum += weight;
                     }
                 }
-                smoothed_data[i] = sum / count;
+                smoothed_data[i] = sum / weight_sum;
             }
+            
             return smoothed_data;
         }
 
-        // Updated processSpectrum to accept window_length and polyorder
         function processSpectrum(wavelength, intensity, window_length, polyorder) {
             const numericIntensity = intensity.map(Number);
-
-            const smoothed = savgol_filter(numericIntensity, window_length, polyorder); // Pass params
+            const smoothed = savgol_filter(numericIntensity, window_length, polyorder);
             const baseline_corrected = smoothed.map(val => val - Math.min(...smoothed));
 
             const derivative = baseline_corrected.map((val, i, arr) => {
@@ -369,9 +496,10 @@
 
             const minDerivative = Math.min(...derivative);
             const maxDerivative = Math.max(...derivative);
+            const range = maxDerivative - minDerivative;
 
             const normalized = derivative.map(val =>
-                maxDerivative - minDerivative === 0 ? 0 : (val - minDerivative) / (maxDerivative - minDerivative)
+                range === 0 ? 0 : (val - minDerivative) / range
             );
 
             const absorption = normalized.map(val => -Math.log10(Math.max(val, 1e-6)));
@@ -383,7 +511,7 @@
             const ctx = document.getElementById('myChart').getContext('2d');
 
             if (myChart) {
-                myChart.destroy(); // Destroy previous chart instance
+                myChart.destroy();
             }
 
             myChart = new Chart(ctx, {
@@ -394,32 +522,77 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    animation: {
+                        duration: 500
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    },
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Absorption Spectra of Different Materials',
+                            text: 'Absorption Spectra',
                             font: {
-                                size: 18
-                            }
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: '#333'
                         },
                         legend: {
                             display: true,
                             position: 'top',
+                            labels: {
+                                padding: 12,
+                                font: {
+                                    size: 11
+                                },
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 10,
+                            titleFont: {
+                                size: 13
+                            },
+                            bodyFont: {
+                                size: 12
+                            },
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y.toFixed(4);
+                                    }
+                                    return label;
+                                }
+                            }
                         },
                         zoom: {
                             zoom: {
                                 wheel: {
                                     enabled: true,
+                                    speed: 0.1,
+                                    modifierKey: null
                                 },
                                 pinch: {
                                     enabled: true
                                 },
-                                mode: 'xy',
+                                drag: {
+                                    enabled: false
+                                },
+                                mode: 'xy'
                             },
-                            pan: { // Enable panning
+                            pan: {
                                 enabled: true,
                                 mode: 'xy',
-                                modifierKey: 'shift', // Hold Shift to pan, or remove for always-on pan
+                                modifierKey: null,
+                                scaleMode: 'xy'
                             }
                         }
                     },
@@ -428,30 +601,64 @@
                             type: 'linear',
                             title: {
                                 display: true,
-                                text: 'Wavelength (nm)'
+                                text: 'Wavelength (nm)',
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                }
                             }
                         },
-                        y: { // Y-axis for Original Intensity
+                        y: {
                             type: 'linear',
                             position: 'left',
                             title: {
                                 display: true,
-                                text: 'Intensity (a.u.)'
-                            }
-                        },
-                        y1: { // Separate Y-axis for Absorbance
-                            type: 'linear',
-                            position: 'right', // Place on the right side
-                            title: {
-                                display: true,
-                                text: 'Absorbance (a.u.)'
+                                text: 'Intensity (a.u.)',
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
                             },
                             grid: {
-                                drawOnChartArea: false, // Only draw grid lines for the left Y-axis
+                                color: 'rgba(0, 0, 0, 0.08)'
                             },
                             ticks: {
-                                callback: function(value, index, ticks) {
-                                    return value.toFixed(2); // Format absorbance ticks
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Absorbance (a.u.)',
+                                font: {
+                                    size: 13,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 10
+                                },
+                                callback: function(value) {
+                                    return value.toFixed(2);
                                 }
                             }
                         }
@@ -460,6 +667,5 @@
             });
         }
     </script>
-
 </body>
 </html>

@@ -6,9 +6,126 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
     <style>
+        :root {
+            /* Light theme colors */
+            --bg-gradient-start: #e0e7ff;
+            --bg-gradient-mid: #f0f4ff;
+            --bg-gradient-end: #e8eeff;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --glass-border: rgba(99, 102, 241, 0.15);
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-tertiary: #64748b;
+            --header-bg: rgba(255, 255, 255, 0.6);
+            --header-border: rgba(99, 102, 241, 0.1);
+            --sidebar-header-bg: rgba(99, 102, 241, 0.1);
+            --sidebar-header-text: #4f46e5;
+            --file-item-bg: rgba(248, 250, 252, 0.5);
+            --file-item-border: rgba(99, 102, 241, 0.15);
+            --file-item-hover-bg: rgba(248, 250, 252, 0.8);
+            --file-item-hover-border: rgba(99, 102, 241, 0.3);
+            --input-bg: rgba(248, 250, 252, 0.5);
+            --input-border: rgba(99, 102, 241, 0.2);
+            --input-focus-border: rgba(99, 102, 241, 0.5);
+            --input-focus-shadow: rgba(99, 102, 241, 0.1);
+            --delete-btn-bg: rgba(239, 68, 68, 0.1);
+            --delete-btn-border: rgba(239, 68, 68, 0.2);
+            --delete-btn-text: #dc2626;
+            --delete-btn-hover-bg: rgba(239, 68, 68, 0.2);
+            --delete-btn-hover-border: rgba(239, 68, 68, 0.4);
+            --delete-btn-hover-text: #b91c1c;
+            --apply-btn-bg: rgba(34, 197, 94, 0.15);
+            --apply-btn-border: rgba(34, 197, 94, 0.3);
+            --apply-btn-text: #16a34a;
+            --apply-btn-hover-bg: rgba(34, 197, 94, 0.25);
+            --apply-btn-hover-border: rgba(34, 197, 94, 0.5);
+            --reset-btn-bg: rgba(99, 102, 241, 0.15);
+            --reset-btn-border: rgba(99, 102, 241, 0.3);
+            --reset-btn-text: #4f46e5;
+            --reset-btn-hover-bg: rgba(99, 102, 241, 0.25);
+            --reset-btn-hover-border: rgba(99, 102, 241, 0.5);
+            --loading-bg: rgba(99, 102, 241, 0.1);
+            --loading-border: rgba(99, 102, 241, 0.2);
+            --loading-text: #4f46e5;
+            --empty-state-text: #94a3b8;
+            --scrollbar-thumb: rgba(99, 102, 241, 0.3);
+            --scrollbar-thumb-hover: rgba(99, 102, 241, 0.5);
+            --chart-legend-text: #475569;
+            --chart-tooltip-bg: rgba(255, 255, 255, 0.95);
+            --chart-tooltip-border: rgba(99, 102, 241, 0.2);
+            --chart-tooltip-title: #1e293b;
+            --chart-tooltip-body: #475569;
+            --chart-axis-title: #64748b;
+            --chart-axis-ticks: #94a3b8;
+            --chart-grid: rgba(99, 102, 241, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --drag-overlay-bg: rgba(99, 102, 241, 0.85);
+        }
+
+        body.dark-theme {
+            /* Dark theme colors */
+            --bg-gradient-start: #0a0e27;
+            --bg-gradient-mid: #1a1d3a;
+            --bg-gradient-end: #0f1833;
+            --glass-bg: rgba(30, 41, 59, 0.4);
+            --glass-border: rgba(148, 163, 184, 0.1);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --header-bg: rgba(15, 23, 42, 0.6);
+            --header-border: rgba(148, 163, 184, 0.1);
+            --sidebar-header-bg: rgba(99, 102, 241, 0.15);
+            --sidebar-header-text: #e0e7ff;
+            --file-item-bg: rgba(51, 65, 85, 0.3);
+            --file-item-border: rgba(148, 163, 184, 0.1);
+            --file-item-hover-bg: rgba(51, 65, 85, 0.5);
+            --file-item-hover-border: rgba(99, 102, 241, 0.3);
+            --input-bg: rgba(51, 65, 85, 0.5);
+            --input-border: rgba(148, 163, 184, 0.2);
+            --input-focus-border: rgba(99, 102, 241, 0.5);
+            --input-focus-shadow: rgba(99, 102, 241, 0.1);
+            --delete-btn-bg: rgba(239, 68, 68, 0.2);
+            --delete-btn-border: rgba(239, 68, 68, 0.3);
+            --delete-btn-text: #fca5a5;
+            --delete-btn-hover-bg: rgba(239, 68, 68, 0.3);
+            --delete-btn-hover-border: rgba(239, 68, 68, 0.5);
+            --delete-btn-hover-text: #fee2e2;
+            --apply-btn-bg: rgba(34, 197, 94, 0.2);
+            --apply-btn-border: rgba(34, 197, 94, 0.3);
+            --apply-btn-text: #86efac;
+            --apply-btn-hover-bg: rgba(34, 197, 94, 0.3);
+            --apply-btn-hover-border: rgba(34, 197, 94, 0.5);
+            --reset-btn-bg: rgba(99, 102, 241, 0.2);
+            --reset-btn-border: rgba(99, 102, 241, 0.3);
+            --reset-btn-text: #c7d2fe;
+            --reset-btn-hover-bg: rgba(99, 102, 241, 0.3);
+            --reset-btn-hover-border: rgba(99, 102, 241, 0.5);
+            --loading-bg: rgba(99, 102, 241, 0.2);
+            --loading-border: rgba(99, 102, 241, 0.3);
+            --loading-text: #c7d2fe;
+            --empty-state-text: #64748b;
+            --scrollbar-thumb: rgba(148, 163, 184, 0.3);
+            --scrollbar-thumb-hover: rgba(148, 163, 184, 0.5);
+            --chart-legend-text: #cbd5e1;
+            --chart-tooltip-bg: rgba(15, 23, 42, 0.9);
+            --chart-tooltip-border: rgba(148, 163, 184, 0.2);
+            --chart-tooltip-title: #e2e8f0;
+            --chart-tooltip-body: #cbd5e1;
+            --chart-axis-title: #94a3b8;
+            --chart-axis-ticks: #64748b;
+            --chart-grid: rgba(148, 163, 184, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --drag-overlay-bg: rgba(139, 92, 246, 0.85);
+        }
+        
         * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+        
+        *:after,
+        *:before {
             box-sizing: border-box;
         }
         
@@ -19,131 +136,245 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
             display: flex;
             flex-direction: column;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         body.drag-active::before {
-            content: "📁 Drop files here";
+            content: "📊 Drop Spectra";
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(102, 126, 234, 0.95);
+            background: var(--drag-overlay-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3em;
-            font-weight: bold;
+            font-weight: 300;
+            letter-spacing: -0.02em;
             z-index: 10000;
             pointer-events: none;
         }
         
         .header {
-            background: linear-gradient(135deg, #011157 0%, #04267d 100%);
-            color: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--header-border);
+            color: var(--text-primary);
+            padding: 20px 30px;
             flex-shrink: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
         }
         
         h1 {
-            font-size: 1.8em;
+            font-size: 1.5em;
+            font-weight: 600;
             margin: 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .theme-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle-wrapper label {
+            position: relative;
+            display: block;
+            width: 60px;
+            height: 32px;
+            border-radius: 32px;
+            background-color: #000839;
+            overflow: hidden;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .theme-toggle-wrapper label:before,
+        .theme-toggle-wrapper label:after {
+            display: block;
+            position: absolute;
+            content: "";
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            transition: 0.5s ease;
+        }
+
+        .theme-toggle-wrapper label:before {
+            background-color: #ffa41b;
+        }
+
+        .theme-toggle-wrapper label:after {
+            background-color: #000839;
+            left: -20px;
+            transform: scale(0.00001);
+        }
+
+        .theme-toggle-wrapper input[type="checkbox"] {
+            display: none;
+        }
+
+        .theme-toggle-wrapper input[type="checkbox"]:checked + label:before {
+            background-color: #FFF;
+            transform: translateX(28px);
+        }
+
+        .theme-toggle-wrapper input[type="checkbox"]:checked + label:after {
+            transform: translateX(42px) scale(1);
         }
         
         .main-container {
             display: flex;
             flex: 1;
             overflow: hidden;
+            gap: 20px;
+            padding: 20px;
         }
 
         .sidebar {
-            width: 280px;
-            background: white;
-            border-right: 1px solid #e0e0e0;
+            width: 260px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px var(--shadow-color);
             flex-shrink: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
         .sidebar-header {
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: bold;
-            font-size: 1.1em;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 20px;
+            background: var(--sidebar-header-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--sidebar-header-text);
+            font-weight: 600;
+            font-size: 0.95em;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
         }
 
         .file-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            padding: 16px;
+        }
+
+        .file-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .file-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .file-list::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+            transition: background 0.3s ease;
+        }
+
+        .file-list::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
         }
 
         .file-item {
-            background: #f8f9fa;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
+            background: var(--file-item-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--file-item-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .file-item:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--file-item-hover-bg);
+            border-color: var(--file-item-hover-border);
             transform: translateY(-2px);
+            box-shadow: 0 4px 16px var(--shadow-color);
         }
 
         .file-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 12px;
             word-break: break-word;
+            font-size: 0.9em;
+            letter-spacing: -0.01em;
+            transition: color 0.3s ease;
         }
 
         .file-controls {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .toggle-group {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.85em;
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .toggle-group:hover {
+            color: var(--text-primary);
         }
 
         .toggle-checkbox {
             width: 16px;
             height: 16px;
             cursor: pointer;
+            accent-color: #6366f1;
         }
 
         .delete-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 6px 10px;
+            background: var(--delete-btn-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: var(--delete-btn-text);
+            border: 1px solid var(--delete-btn-border);
+            border-radius: 8px;
+            padding: 8px 12px;
             cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 6px;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 4px;
         }
 
         .delete-btn:hover {
+            background: var(--delete-btn-hover-bg);
+            border-color: var(--delete-btn-hover-border);
+            color: var(--delete-btn-hover-text);
             transform: translateY(-1px);
-            box-shadow: 0 2px 6px rgba(220, 53, 69, 0.4);
         }
 
         .content-area {
@@ -151,76 +382,100 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            gap: 20px;
         }
         
         .controls {
-            background-color: white;
-            padding: 20px 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px 24px;
             display: flex;
             gap: 20px;
             align-items: center;
             flex-wrap: wrap;
-            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 8px 32px var(--shadow-color);
             flex-shrink: 0;
+            transition: all 0.3s ease;
         }
         
         .param-group {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .param-group label {
-            font-weight: 600;
-            color: #333;
-            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.85em;
             white-space: nowrap;
+            letter-spacing: 0.01em;
+            transition: color 0.3s ease;
         }
         
         .param-group input[type="number"] {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            width: 80px;
-            font-size: 0.95em;
-            transition: border-color 0.3s ease;
+            padding: 10px 14px;
+            background: var(--input-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            width: 75px;
+            font-size: 0.9em;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .param-group input[type="number"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--input-focus-border);
+            background: var(--file-item-hover-bg);
+            box-shadow: 0 0 0 3px var(--input-focus-shadow);
         }
         
         button {
             padding: 10px 20px;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.95em;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.01em;
         }
         
         #applyParams {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            background: var(--apply-btn-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--apply-btn-border);
+            color: var(--apply-btn-text);
         }
         
         #applyParams:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            background: var(--apply-btn-hover-bg);
+            border-color: var(--apply-btn-hover-border);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
         }
         
         #resetZoom {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+            background: var(--reset-btn-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--reset-btn-border);
+            color: var(--reset-btn-text);
         }
         
         #resetZoom:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+            background: var(--reset-btn-hover-bg);
+            border-color: var(--reset-btn-hover-border);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
         }
         
         button:active {
@@ -230,37 +485,33 @@
         #chart-container {
             flex: 1;
             position: relative;
-            background: white;
-            padding: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
             overflow: hidden;
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s ease;
         }
         
         #chart-container canvas {
-            cursor: grab;
-        }
-        
-        #chart-container canvas:active {
-            cursor: grabbing;
-        }
-        
-        .info-bar {
-            background-color: #f8f9fa;
-            padding: 8px 30px;
-            text-align: center;
-            color: #666;
-            font-size: 0.85em;
-            border-top: 1px solid #e0e0e0;
-            flex-shrink: 0;
+            cursor: cursor;
         }
         
         .loading {
             display: none;
-            padding: 10px;
+            padding: 12px;
             text-align: center;
-            background-color: #fff3cd;
-            color: #856404;
-            border-bottom: 1px solid #ffc107;
-            font-size: 0.9em;
+            background: var(--loading-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--loading-border);
+            color: var(--loading-text);
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
         
         .loading.active {
@@ -274,31 +525,42 @@
         
         .spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(0, 28, 168, 0.3);
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(167, 139, 250, 0.3);
             border-radius: 50%;
-            border-top-color: #160094;
-            animation: spin 1s linear infinite;
+            border-top-color: #a78bfa;
+            animation: spin 0.8s linear infinite;
             margin-right: 8px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 30px 20px;
-            color: #999;
-            font-size: 0.9em;
+            padding: 40px 20px;
+            color: var(--empty-state-text);
+            font-size: 0.85em;
+            transition: color 0.3s ease;
         }
 
         .empty-state-icon {
             font-size: 3em;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-weight: 400;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Absorption Spectra Analyzer</h1>
+        <div class="theme-toggle-wrapper">		
+            <input type="checkbox" id="toggle"/>
+            <label for="toggle"></label>
+        </div>
     </div>
 
     <div class="loading" id="loading">
@@ -308,12 +570,12 @@
     <div class="main-container">
         <div class="sidebar">
             <div class="sidebar-header">
-                📂 File Manager
+                Spectra Library
             </div>
             <div class="file-list" id="fileList">
                 <div class="empty-state">
-                    <div class="empty-state-icon">📁</div>
-                    <div>Drag and drop files anywhere<br>or click to browse</div>
+                    <div class="empty-state-icon">📊</div>
+                    <div class="empty-state-text">Drop files anywhere<br>to begin analysis</div>
                 </div>
             </div>
         </div>
@@ -321,25 +583,21 @@
         <div class="content-area">
             <div class="controls">
                 <div class="param-group">
-                    <label for="windowLength">Window:</label>
+                    <label for="windowLength">Window</label>
                     <input type="number" id="windowLength" value="11" min="3" step="2"> 
                 </div>
                 
                 <div class="param-group">
-                    <label for="polyOrder">Poly Order:</label>
+                    <label for="polyOrder">Poly Order</label>
                     <input type="number" id="polyOrder" value="2" min="1" max="5">
                 </div>
                 
                 <button id="applyParams">Apply</button>
-                <button id="resetZoom">Reset Zoom</button>
+                <button id="resetZoom">Reset View</button>
             </div>
 
             <div id="chart-container">
                 <canvas id="myChart"></canvas>
-            </div>
-            
-            <div class="info-bar">
-                💡 Scroll to zoom • Click and drag to pan • Double-click to reset
             </div>
         </div>
     </div>
@@ -347,6 +605,32 @@
     <input type="file" id="fileElem" multiple accept=".xlsx, .xls, .csv" style="display: none;">
 
     <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('toggle');
+        const body = document.body;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            body.classList.add('dark-theme');
+            themeToggle.checked = true;
+        }
+
+        themeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('dark-theme');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.classList.remove('dark-theme');
+                localStorage.setItem('theme', 'light');
+            }
+            
+            // Update chart colors if chart exists
+            if (myChart) {
+                updateChartTheme();
+            }
+        });
+
         const fileElem = document.getElementById('fileElem');
         const fileListContainer = document.getElementById('fileList');
         const resetZoomButton = document.getElementById('resetZoom');
@@ -357,17 +641,30 @@
         let myChart;
         let loadedFilesData = [];
 
-        const ORIGINAL_SPECTRUM_COLOR = 'rgba(54, 162, 235, 0.5)';
+        // Contrasting colors - cool colors for originals, highly contrasting warm colors for absorbance
+        const ORIGINAL_SPECTRUM_COLORS = [
+            'rgba(59, 130, 246, 0.6)',   // Blue
+            'rgba(139, 92, 246, 0.6)',   // Purple
+            'rgba(14, 165, 233, 0.6)',   // Sky Blue
+            'rgba(168, 85, 247, 0.6)',   // Violet
+            'rgba(6, 182, 212, 0.6)',    // Cyan
+            'rgba(99, 102, 241, 0.6)',   // Indigo
+            'rgba(79, 70, 229, 0.6)',    // Deep Blue
+            'rgba(147, 51, 234, 0.6)',   // Purple
+            'rgba(37, 99, 235, 0.6)'     // Royal Blue
+        ];
+
+        // High contrast colors for absorbance - each very different from the others
         const PROCESSED_SPECTRUM_COLORS = [
-            'rgba(255, 99, 132, 0.9)',
-            'rgba(255, 206, 86, 0.9)',
-            'rgba(75, 192, 192, 0.9)',
-            'rgba(153, 102, 255, 0.9)',
-            'rgba(255, 159, 64, 0.9)',
-            'rgba(46, 204, 113, 0.9)',
-            'rgba(52, 152, 219, 0.9)',
-            'rgba(155, 89, 182, 0.9)',
-            'rgba(241, 196, 15, 0.9)'
+            'rgba(239, 68, 68, 0.9)',      // Bright Red
+            'rgba(34, 197, 94, 0.9)',      // Bright Green
+            'rgba(234, 179, 8, 0.9)',      // Golden Yellow
+            'rgba(236, 72, 153, 0.9)',     // Hot Pink
+            'rgba(249, 115, 22, 0.9)',     // Deep Orange
+            'rgba(20, 184, 166, 0.9)',     // Teal
+            'rgba(168, 85, 247, 0.9)',     // Purple
+            'rgba(132, 204, 22, 0.9)',     // Lime Green
+            'rgba(14, 165, 233, 0.9)'      // Sky Blue
         ];
 
         // Global drag and drop events
@@ -519,8 +816,8 @@
             if (loadedFilesData.length === 0) {
                 fileListContainer.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-state-icon">📁</div>
-                        <div>Drag and drop files anywhere<br>or click to browse</div>
+                        <div class="empty-state-icon">📊</div>
+                        <div class="empty-state-text">Drop files anywhere<br>to begin analysis</div>
                     </div>
                 `;
                 return;
@@ -536,13 +833,13 @@
                     <div class="file-controls">
                         <div class="toggle-group">
                             <input type="checkbox" class="toggle-checkbox" id="show-original-${index}" ${fileData.showOriginal ? 'checked' : ''}>
-                            <label for="show-original-${index}">Show Original</label>
+                            <label for="show-original-${index}">Original</label>
                         </div>
                         <div class="toggle-group">
                             <input type="checkbox" class="toggle-checkbox" id="show-absorbance-${index}" ${fileData.showAbsorbance ? 'checked' : ''}>
-                            <label for="show-absorbance-${index}">Show Absorbance</label>
+                            <label for="show-absorbance-${index}">Absorbance</label>
                         </div>
-                        <button class="delete-btn" data-index="${index}">🗑️ Remove</button>
+                        <button class="delete-btn" data-index="${index}">Remove</button>
                     </div>
                 `;
 
@@ -564,6 +861,45 @@
 
                 fileListContainer.appendChild(fileItem);
             });
+        }
+
+        function getChartColors() {
+            const isDark = body.classList.contains('dark-theme');
+            return {
+                legendText: isDark ? '#cbd5e1' : '#475569',
+                tooltipBg: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+                tooltipBorder: isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(99, 102, 241, 0.2)',
+                tooltipTitle: isDark ? '#e2e8f0' : '#1e293b',
+                tooltipBody: isDark ? '#cbd5e1' : '#475569',
+                axisTitle: isDark ? '#94a3b8' : '#64748b',
+                axisTicks: isDark ? '#64748b' : '#94a3b8',
+                grid: isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(99, 102, 241, 0.1)'
+            };
+        }
+
+        function updateChartTheme() {
+            if (!myChart) return;
+            
+            const colors = getChartColors();
+            
+            myChart.options.plugins.legend.labels.color = colors.legendText;
+            myChart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
+            myChart.options.plugins.tooltip.borderColor = colors.tooltipBorder;
+            myChart.options.plugins.tooltip.titleColor = colors.tooltipTitle;
+            myChart.options.plugins.tooltip.bodyColor = colors.tooltipBody;
+            
+            myChart.options.scales.x.title.color = colors.axisTitle;
+            myChart.options.scales.x.ticks.color = colors.axisTicks;
+            myChart.options.scales.x.grid.color = colors.grid;
+            
+            myChart.options.scales.y.title.color = colors.axisTitle;
+            myChart.options.scales.y.ticks.color = colors.axisTicks;
+            myChart.options.scales.y.grid.color = colors.grid;
+            
+            myChart.options.scales.y1.title.color = colors.axisTitle;
+            myChart.options.scales.y1.ticks.color = colors.axisTicks;
+            
+            myChart.update();
         }
 
         function processAndRenderAllFiles() {
@@ -601,8 +937,8 @@
                     allDatasets.push({
                         label: `${name} (Original)`,
                         data: intensity.map((val, i) => ({ x: wavelength[i], y: val })),
-                        borderColor: ORIGINAL_SPECTRUM_COLOR,
-                        backgroundColor: ORIGINAL_SPECTRUM_COLOR.replace('0.5)', '0.1)'),
+                        borderColor: ORIGINAL_SPECTRUM_COLORS[colorIndex % ORIGINAL_SPECTRUM_COLORS.length],
+                        backgroundColor: ORIGINAL_SPECTRUM_COLORS[colorIndex % ORIGINAL_SPECTRUM_COLORS.length].replace('0.6)', '0.1)'),
                         borderWidth: 1.5,
                         fill: false,
                         pointRadius: 0,
@@ -705,6 +1041,7 @@
 
         function renderChart(datasets) {
             const ctx = document.getElementById('myChart').getContext('2d');
+            const colors = getChartColors();
 
             if (myChart) {
                 myChart.destroy();
@@ -719,7 +1056,8 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     animation: {
-                        duration: 500
+                        duration: 400,
+                        easing: 'easeInOutQuart'
                     },
                     interaction: {
                         mode: 'nearest',
@@ -728,34 +1066,42 @@
                     },
                     plugins: {
                         title: {
-                            display: true,
-                            text: 'Absorption Spectra',
-                            font: {
-                                size: 18,
-                                weight: 'bold'
-                            },
-                            color: '#333'
+                            display: false
                         },
                         legend: {
                             display: true,
                             position: 'top',
                             labels: {
-                                padding: 12,
+                                padding: 16,
                                 font: {
-                                    size: 11
+                                    size: 11,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
+                                    weight: '500'
                                 },
-                                usePointStyle: true
+                                color: colors.legendText,
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                boxHeight: 8
                             }
                         },
                         tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 10,
+                            backgroundColor: colors.tooltipBg,
+                            backdropFilter: 'blur(10px)',
+                            padding: 12,
                             titleFont: {
-                                size: 13
+                                size: 12,
+                                family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
+                                weight: '600'
                             },
                             bodyFont: {
-                                size: 12
+                                size: 11,
+                                family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
                             },
+                            titleColor: colors.tooltipTitle,
+                            bodyColor: colors.tooltipBody,
+                            borderColor: colors.tooltipBorder,
+                            borderWidth: 1,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
@@ -770,27 +1116,23 @@
                             }
                         },
                         zoom: {
-                            zoom: {
-                                wheel: {
-                                    enabled: true,
-                                    speed: 0.1,
-                                    modifierKey: null
-                                },
-                                pinch: {
-                                    enabled: true
-                                },
-                                drag: {
-                                    enabled: false
-                                },
-                                mode: 'xy'
-                            },
-                            pan: {
-                                enabled: true,
-                                mode: 'xy',
-                                modifierKey: null,
-                                scaleMode: 'xy'
-                            }
-                        }
+    pan: {
+        enabled: true,
+        mode: 'xy',
+        threshold: 5
+    },
+    zoom: {
+        wheel: {
+            enabled: true,
+            speed: 0.1
+        },
+        pinch: {
+            enabled: true
+        },
+        mode: 'xy'
+    }
+}
+
                     },
                     scales: {
                         x: {
@@ -799,18 +1141,22 @@
                                 display: true,
                                 text: 'Wavelength (nm)',
                                 font: {
-                                    size: 13,
-                                    weight: 'bold'
+                                    size: 12,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
+                                    weight: '500'
                                 },
-                                color: '#333'
+                                color: colors.axisTitle
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.05)'
+                                color: colors.grid,
+                                drawBorder: false
                             },
                             ticks: {
                                 font: {
-                                    size: 10
-                                }
+                                    size: 10,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
+                                },
+                                color: colors.axisTicks
                             }
                         },
                         y: {
@@ -820,18 +1166,22 @@
                                 display: true,
                                 text: 'Intensity (a.u.)',
                                 font: {
-                                    size: 13,
-                                    weight: 'bold'
+                                    size: 12,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
+                                    weight: '500'
                                 },
-                                color: '#333'
+                                color: colors.axisTitle
                             },
                             grid: {
-                                color: 'rgba(0, 0, 0, 0.08)'
+                                color: colors.grid,
+                                drawBorder: false
                             },
                             ticks: {
                                 font: {
-                                    size: 10
-                                }
+                                    size: 10,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
+                                },
+                                color: colors.axisTicks
                             }
                         },
                         y1: {
@@ -841,18 +1191,22 @@
                                 display: true,
                                 text: 'Absorbance (a.u.)',
                                 font: {
-                                    size: 13,
-                                    weight: 'bold'
+                                    size: 12,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
+                                    weight: '500'
                                 },
-                                color: '#333'
+                                color: colors.axisTitle
                             },
                             grid: {
-                                drawOnChartArea: false
+                                drawOnChartArea: false,
+                                drawBorder: false
                             },
                             ticks: {
                                 font: {
-                                    size: 10
+                                    size: 10,
+                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
                                 },
+                                color: colors.axisTicks,
                                 callback: function(value) {
                                     return value.toFixed(2);
                                 }

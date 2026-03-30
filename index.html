@@ -6,7 +6,6 @@
 <title>NIR Spectra Analyzer</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 <style>
 :root {
   --bg-start: #e0e7ff; --bg-mid: #f0f4ff; --bg-end: #e8eeff;
@@ -192,8 +191,6 @@ button{
 }
 #applyParams{background:var(--apply-btn-bg);border:1px solid var(--apply-btn-border);color:var(--apply-btn-text)}
 #applyParams:hover{background:var(--apply-btn-hover-bg);border-color:var(--apply-btn-hover-border);transform:translateY(-2px);box-shadow:0 4px 14px rgba(34,197,94,0.22)}
-.reset-btn{background:var(--reset-btn-bg);border:1px solid var(--reset-btn-border);color:var(--reset-btn-text)}
-.reset-btn:hover{background:var(--reset-btn-hover-bg);border-color:var(--reset-btn-hover-border);transform:translateY(-2px);box-shadow:0 4px 14px rgba(99,102,241,0.22)}
 button:active{transform:translateY(0)!important}
 .charts-area{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden;min-height:0}
 .chart-panel{
@@ -204,7 +201,7 @@ button:active{transform:translateY(0)!important}
 }
 .chart-panel-title{font-size:0.76em;font-weight:600;color:var(--text-secondary);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:7px;flex-shrink:0}
 .chart-canvas-wrap{flex:1;position:relative;min-height:0}
-.chart-canvas-wrap canvas{cursor:crosshair}
+.chart-canvas-wrap canvas{cursor:default}
 </style>
 </head>
 <body>
@@ -255,9 +252,7 @@ button:active{transform:translateY(0)!important}
       </div>
       <div class="ctrl-divider"></div>
       <button id="applyParams">Apply</button>
-      <button class="reset-btn" id="resetZoomR">Reset Reflectance</button>
-      <button class="reset-btn" id="resetZoomA">Reset Absorbance</button>
-    </div>
+      </div>
 
     <div class="charts-area">
       <div class="chart-panel">
@@ -332,8 +327,6 @@ document.body.addEventListener('drop', (e) => { dragCtr = 0; body.classList.remo
 
 // Controls
 document.getElementById('applyParams').addEventListener('click', () => { if (loadedFiles.length) processAndRender(); });
-document.getElementById('resetZoomR').addEventListener('click', () => chartR && chartR.resetZoom());
-document.getElementById('resetZoomA').addEventListener('click', () => chartA && chartA.resetZoom());
 
 // File reader helper
 function readAsync(file, type) {
@@ -509,10 +502,6 @@ function makeOpts(yLabel) {
         titleColor: c.tooltipTitle, bodyColor: c.tooltipBody,
         borderColor: c.tooltipBorder, borderWidth: 1, cornerRadius: 8,
         callbacks: { label: ctx => { let l = (ctx.dataset.label || '') + ': '; l += (ctx.parsed.y ?? 0).toFixed(4); return l; } }
-      },
-      zoom: {
-        pan: { enabled: true, mode: 'xy', threshold: 5 },
-        zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, mode: 'xy' }
       }
     },
     scales: {

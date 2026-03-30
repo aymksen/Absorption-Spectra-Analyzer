@@ -1,1221 +1,576 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Absorption Spectra Analyzer</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-    <style>
-        :root {
-            /* Light theme colors */
-            --bg-gradient-start: #e0e7ff;
-            --bg-gradient-mid: #f0f4ff;
-            --bg-gradient-end: #e8eeff;
-            --glass-bg: rgba(255, 255, 255, 0.4);
-            --glass-border: rgba(99, 102, 241, 0.15);
-            --text-primary: #1e293b;
-            --text-secondary: #475569;
-            --text-tertiary: #64748b;
-            --header-bg: rgba(255, 255, 255, 0.6);
-            --header-border: rgba(99, 102, 241, 0.1);
-            --sidebar-header-bg: rgba(99, 102, 241, 0.1);
-            --sidebar-header-text: #4f46e5;
-            --file-item-bg: rgba(248, 250, 252, 0.5);
-            --file-item-border: rgba(99, 102, 241, 0.15);
-            --file-item-hover-bg: rgba(248, 250, 252, 0.8);
-            --file-item-hover-border: rgba(99, 102, 241, 0.3);
-            --input-bg: rgba(248, 250, 252, 0.5);
-            --input-border: rgba(99, 102, 241, 0.2);
-            --input-focus-border: rgba(99, 102, 241, 0.5);
-            --input-focus-shadow: rgba(99, 102, 241, 0.1);
-            --delete-btn-bg: rgba(239, 68, 68, 0.1);
-            --delete-btn-border: rgba(239, 68, 68, 0.2);
-            --delete-btn-text: #dc2626;
-            --delete-btn-hover-bg: rgba(239, 68, 68, 0.2);
-            --delete-btn-hover-border: rgba(239, 68, 68, 0.4);
-            --delete-btn-hover-text: #b91c1c;
-            --apply-btn-bg: rgba(34, 197, 94, 0.15);
-            --apply-btn-border: rgba(34, 197, 94, 0.3);
-            --apply-btn-text: #16a34a;
-            --apply-btn-hover-bg: rgba(34, 197, 94, 0.25);
-            --apply-btn-hover-border: rgba(34, 197, 94, 0.5);
-            --reset-btn-bg: rgba(99, 102, 241, 0.15);
-            --reset-btn-border: rgba(99, 102, 241, 0.3);
-            --reset-btn-text: #4f46e5;
-            --reset-btn-hover-bg: rgba(99, 102, 241, 0.25);
-            --reset-btn-hover-border: rgba(99, 102, 241, 0.5);
-            --loading-bg: rgba(99, 102, 241, 0.1);
-            --loading-border: rgba(99, 102, 241, 0.2);
-            --loading-text: #4f46e5;
-            --empty-state-text: #94a3b8;
-            --scrollbar-thumb: rgba(99, 102, 241, 0.3);
-            --scrollbar-thumb-hover: rgba(99, 102, 241, 0.5);
-            --chart-legend-text: #475569;
-            --chart-tooltip-bg: rgba(255, 255, 255, 0.95);
-            --chart-tooltip-border: rgba(99, 102, 241, 0.2);
-            --chart-tooltip-title: #1e293b;
-            --chart-tooltip-body: #475569;
-            --chart-axis-title: #64748b;
-            --chart-axis-ticks: #94a3b8;
-            --chart-grid: rgba(99, 102, 241, 0.1);
-            --shadow-color: rgba(0, 0, 0, 0.1);
-            --drag-overlay-bg: rgba(99, 102, 241, 0.85);
-        }
-
-        body.dark-theme {
-            /* Dark theme colors */
-            --bg-gradient-start: #0a0e27;
-            --bg-gradient-mid: #1a1d3a;
-            --bg-gradient-end: #0f1833;
-            --glass-bg: rgba(30, 41, 59, 0.4);
-            --glass-border: rgba(148, 163, 184, 0.1);
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-tertiary: #94a3b8;
-            --header-bg: rgba(15, 23, 42, 0.6);
-            --header-border: rgba(148, 163, 184, 0.1);
-            --sidebar-header-bg: rgba(99, 102, 241, 0.15);
-            --sidebar-header-text: #e0e7ff;
-            --file-item-bg: rgba(51, 65, 85, 0.3);
-            --file-item-border: rgba(148, 163, 184, 0.1);
-            --file-item-hover-bg: rgba(51, 65, 85, 0.5);
-            --file-item-hover-border: rgba(99, 102, 241, 0.3);
-            --input-bg: rgba(51, 65, 85, 0.5);
-            --input-border: rgba(148, 163, 184, 0.2);
-            --input-focus-border: rgba(99, 102, 241, 0.5);
-            --input-focus-shadow: rgba(99, 102, 241, 0.1);
-            --delete-btn-bg: rgba(239, 68, 68, 0.2);
-            --delete-btn-border: rgba(239, 68, 68, 0.3);
-            --delete-btn-text: #fca5a5;
-            --delete-btn-hover-bg: rgba(239, 68, 68, 0.3);
-            --delete-btn-hover-border: rgba(239, 68, 68, 0.5);
-            --delete-btn-hover-text: #fee2e2;
-            --apply-btn-bg: rgba(34, 197, 94, 0.2);
-            --apply-btn-border: rgba(34, 197, 94, 0.3);
-            --apply-btn-text: #86efac;
-            --apply-btn-hover-bg: rgba(34, 197, 94, 0.3);
-            --apply-btn-hover-border: rgba(34, 197, 94, 0.5);
-            --reset-btn-bg: rgba(99, 102, 241, 0.2);
-            --reset-btn-border: rgba(99, 102, 241, 0.3);
-            --reset-btn-text: #c7d2fe;
-            --reset-btn-hover-bg: rgba(99, 102, 241, 0.3);
-            --reset-btn-hover-border: rgba(99, 102, 241, 0.5);
-            --loading-bg: rgba(99, 102, 241, 0.2);
-            --loading-border: rgba(99, 102, 241, 0.3);
-            --loading-text: #c7d2fe;
-            --empty-state-text: #64748b;
-            --scrollbar-thumb: rgba(148, 163, 184, 0.3);
-            --scrollbar-thumb-hover: rgba(148, 163, 184, 0.5);
-            --chart-legend-text: #cbd5e1;
-            --chart-tooltip-bg: rgba(15, 23, 42, 0.9);
-            --chart-tooltip-border: rgba(148, 163, 184, 0.2);
-            --chart-tooltip-title: #e2e8f0;
-            --chart-tooltip-body: #cbd5e1;
-            --chart-axis-title: #94a3b8;
-            --chart-axis-ticks: #64748b;
-            --chart-grid: rgba(148, 163, 184, 0.1);
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --drag-overlay-bg: rgba(139, 92, 246, 0.85);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        *:after,
-        *:before {
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
-            display: flex;
-            flex-direction: column;
-            color: var(--text-primary);
-            transition: background 0.3s ease, color 0.3s ease;
-        }
-
-        body.drag-active::before {
-            content: "📊 Drop Spectra";
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--drag-overlay-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3em;
-            font-weight: 300;
-            letter-spacing: -0.02em;
-            z-index: 10000;
-            pointer-events: none;
-        }
-        
-        .header {
-            background: var(--header-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--header-border);
-            color: var(--text-primary);
-            padding: 20px 30px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        
-        h1 {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin: 0;
-            letter-spacing: -0.02em;
-        }
-
-        .theme-toggle-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .theme-toggle-wrapper label {
-            position: relative;
-            display: block;
-            width: 60px;
-            height: 32px;
-            border-radius: 32px;
-            background-color: #000839;
-            overflow: hidden;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .theme-toggle-wrapper label:before,
-        .theme-toggle-wrapper label:after {
-            display: block;
-            position: absolute;
-            content: "";
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            top: 4px;
-            left: 4px;
-            transition: 0.5s ease;
-        }
-
-        .theme-toggle-wrapper label:before {
-            background-color: #ffa41b;
-        }
-
-        .theme-toggle-wrapper label:after {
-            background-color: #000839;
-            left: -20px;
-            transform: scale(0.00001);
-        }
-
-        .theme-toggle-wrapper input[type="checkbox"] {
-            display: none;
-        }
-
-        .theme-toggle-wrapper input[type="checkbox"]:checked + label:before {
-            background-color: #FFF;
-            transform: translateX(28px);
-        }
-
-        .theme-toggle-wrapper input[type="checkbox"]:checked + label:after {
-            transform: translateX(42px) scale(1);
-        }
-        
-        .main-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-            gap: 20px;
-            padding: 20px;
-        }
-
-        .sidebar {
-            width: 260px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 8px 32px var(--shadow-color);
-            flex-shrink: 0;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            background: var(--sidebar-header-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--glass-border);
-            color: var(--sidebar-header-text);
-            font-weight: 600;
-            font-size: 0.95em;
-            letter-spacing: 0.02em;
-            text-transform: uppercase;
-            transition: all 0.3s ease;
-        }
-
-        .file-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        .file-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .file-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .file-list::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb);
-            border-radius: 3px;
-            transition: background 0.3s ease;
-        }
-
-        .file-list::-webkit-scrollbar-thumb:hover {
-            background: var(--scrollbar-thumb-hover);
-        }
-
-        .file-item {
-            background: var(--file-item-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--file-item-border);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .file-item:hover {
-            background: var(--file-item-hover-bg);
-            border-color: var(--file-item-hover-border);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px var(--shadow-color);
-        }
-
-        .file-name {
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 12px;
-            word-break: break-word;
-            font-size: 0.9em;
-            letter-spacing: -0.01em;
-            transition: color 0.3s ease;
-        }
-
-        .file-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .toggle-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.8em;
-            color: var(--text-secondary);
-            transition: color 0.3s ease;
-        }
-
-        .toggle-group:hover {
-            color: var(--text-primary);
-        }
-
-        .toggle-checkbox {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-            accent-color: #6366f1;
-        }
-
-        .delete-btn {
-            background: var(--delete-btn-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: var(--delete-btn-text);
-            border: 1px solid var(--delete-btn-border);
-            border-radius: 8px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 0.8em;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-top: 4px;
-        }
-
-        .delete-btn:hover {
-            background: var(--delete-btn-hover-bg);
-            border-color: var(--delete-btn-hover-border);
-            color: var(--delete-btn-hover-text);
-            transform: translateY(-1px);
-        }
-
-        .content-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            gap: 20px;
-        }
-        
-        .controls {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px 24px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
-            box-shadow: 0 8px 32px var(--shadow-color);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-        
-        .param-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .param-group label {
-            font-weight: 500;
-            color: var(--text-secondary);
-            font-size: 0.85em;
-            white-space: nowrap;
-            letter-spacing: 0.01em;
-            transition: color 0.3s ease;
-        }
-        
-        .param-group input[type="number"] {
-            padding: 10px 14px;
-            background: var(--input-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--input-border);
-            border-radius: 10px;
-            width: 75px;
-            font-size: 0.9em;
-            color: var(--text-primary);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .param-group input[type="number"]:focus {
-            outline: none;
-            border-color: var(--input-focus-border);
-            background: var(--file-item-hover-bg);
-            box-shadow: 0 0 0 3px var(--input-focus-shadow);
-        }
-        
-        button {
-            padding: 10px 20px;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            letter-spacing: 0.01em;
-        }
-        
-        #applyParams {
-            background: var(--apply-btn-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--apply-btn-border);
-            color: var(--apply-btn-text);
-        }
-        
-        #applyParams:hover {
-            background: var(--apply-btn-hover-bg);
-            border-color: var(--apply-btn-hover-border);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
-        }
-        
-        #resetZoom {
-            background: var(--reset-btn-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--reset-btn-border);
-            color: var(--reset-btn-text);
-        }
-        
-        #resetZoom:hover {
-            background: var(--reset-btn-hover-bg);
-            border-color: var(--reset-btn-hover-border);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        #chart-container {
-            flex: 1;
-            position: relative;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 24px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px var(--shadow-color);
-            transition: all 0.3s ease;
-        }
-        
-        #chart-container canvas {
-            cursor: cursor;
-        }
-        
-        .loading {
-            display: none;
-            padding: 12px;
-            text-align: center;
-            background: var(--loading-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--loading-border);
-            color: var(--loading-text);
-            font-size: 0.85em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .loading.active {
-            display: block;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(167, 139, 250, 0.3);
-            border-radius: 50%;
-            border-top-color: #a78bfa;
-            animation: spin 0.8s linear infinite;
-            margin-right: 8px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--empty-state-text);
-            font-size: 0.85em;
-            transition: color 0.3s ease;
-        }
-
-        .empty-state-icon {
-            font-size: 3em;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        .empty-state-text {
-            font-weight: 400;
-            line-height: 1.6;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIR Spectra Analyzer</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<style>
+:root {
+  --bg-start: #e0e7ff; --bg-mid: #f0f4ff; --bg-end: #e8eeff;
+  --glass-bg: rgba(255,255,255,0.45); --glass-border: rgba(99,102,241,0.15);
+  --text-primary: #1e293b; --text-secondary: #475569; --text-tertiary: #64748b;
+  --header-bg: rgba(255,255,255,0.65); --header-border: rgba(99,102,241,0.12);
+  --sidebar-header-bg: rgba(99,102,241,0.1); --sidebar-header-text: #4f46e5;
+  --file-item-bg: rgba(248,250,252,0.6); --file-item-border: rgba(99,102,241,0.15);
+  --file-item-hover-bg: rgba(248,250,252,0.9); --file-item-hover-border: rgba(99,102,241,0.35);
+  --input-bg: rgba(248,250,252,0.6); --input-border: rgba(99,102,241,0.2);
+  --input-focus-border: rgba(99,102,241,0.55); --input-focus-shadow: rgba(99,102,241,0.12);
+  --delete-btn-bg: rgba(239,68,68,0.1); --delete-btn-border: rgba(239,68,68,0.22);
+  --delete-btn-text: #dc2626; --delete-btn-hover-bg: rgba(239,68,68,0.22);
+  --delete-btn-hover-border: rgba(239,68,68,0.45); --delete-btn-hover-text: #b91c1c;
+  --apply-btn-bg: rgba(34,197,94,0.14); --apply-btn-border: rgba(34,197,94,0.3);
+  --apply-btn-text: #16a34a; --apply-btn-hover-bg: rgba(34,197,94,0.26);
+  --apply-btn-hover-border: rgba(34,197,94,0.52);
+  --reset-btn-bg: rgba(99,102,241,0.14); --reset-btn-border: rgba(99,102,241,0.28);
+  --reset-btn-text: #4f46e5; --reset-btn-hover-bg: rgba(99,102,241,0.26);
+  --reset-btn-hover-border: rgba(99,102,241,0.52);
+  --loading-bg: rgba(99,102,241,0.1); --loading-border: rgba(99,102,241,0.2);
+  --loading-text: #4f46e5; --empty-state-text: #94a3b8;
+  --scrollbar-thumb: rgba(99,102,241,0.3); --scrollbar-thumb-hover: rgba(99,102,241,0.5);
+  --chart-legend: #475569; --chart-tooltip-bg: rgba(255,255,255,0.95);
+  --chart-tooltip-border: rgba(99,102,241,0.2); --chart-tooltip-title: #1e293b;
+  --chart-tooltip-body: #475569; --chart-axis-title: #64748b;
+  --chart-axis-ticks: #94a3b8; --chart-grid: rgba(99,102,241,0.1);
+  --shadow: rgba(0,0,0,0.1); --drag-overlay: rgba(99,102,241,0.88);
+  --white-ref-bg: rgba(14,165,233,0.08); --white-ref-border: rgba(14,165,233,0.2);
+  --white-ref-text: #0369a1; --white-ref-icon: #38bdf8;
+}
+body.dark-theme {
+  --bg-start: #0a0e27; --bg-mid: #1a1d3a; --bg-end: #0f1833;
+  --glass-bg: rgba(30,41,59,0.42); --glass-border: rgba(148,163,184,0.1);
+  --text-primary: #f1f5f9; --text-secondary: #cbd5e1; --text-tertiary: #94a3b8;
+  --header-bg: rgba(15,23,42,0.65); --header-border: rgba(148,163,184,0.1);
+  --sidebar-header-bg: rgba(99,102,241,0.16); --sidebar-header-text: #e0e7ff;
+  --file-item-bg: rgba(51,65,85,0.32); --file-item-border: rgba(148,163,184,0.1);
+  --file-item-hover-bg: rgba(51,65,85,0.55); --file-item-hover-border: rgba(99,102,241,0.32);
+  --input-bg: rgba(51,65,85,0.5); --input-border: rgba(148,163,184,0.2);
+  --input-focus-border: rgba(99,102,241,0.5); --input-focus-shadow: rgba(99,102,241,0.12);
+  --delete-btn-bg: rgba(239,68,68,0.2); --delete-btn-border: rgba(239,68,68,0.32);
+  --delete-btn-text: #fca5a5; --delete-btn-hover-bg: rgba(239,68,68,0.32);
+  --delete-btn-hover-border: rgba(239,68,68,0.55); --delete-btn-hover-text: #fee2e2;
+  --apply-btn-bg: rgba(34,197,94,0.2); --apply-btn-border: rgba(34,197,94,0.32);
+  --apply-btn-text: #86efac; --apply-btn-hover-bg: rgba(34,197,94,0.32);
+  --apply-btn-hover-border: rgba(34,197,94,0.55);
+  --reset-btn-bg: rgba(99,102,241,0.2); --reset-btn-border: rgba(99,102,241,0.32);
+  --reset-btn-text: #c7d2fe; --reset-btn-hover-bg: rgba(99,102,241,0.32);
+  --reset-btn-hover-border: rgba(99,102,241,0.55);
+  --loading-bg: rgba(99,102,241,0.2); --loading-border: rgba(99,102,241,0.32);
+  --loading-text: #c7d2fe; --empty-state-text: #64748b;
+  --scrollbar-thumb: rgba(148,163,184,0.3); --scrollbar-thumb-hover: rgba(148,163,184,0.5);
+  --chart-legend: #cbd5e1; --chart-tooltip-bg: rgba(15,23,42,0.9);
+  --chart-tooltip-border: rgba(148,163,184,0.2); --chart-tooltip-title: #e2e8f0;
+  --chart-tooltip-body: #cbd5e1; --chart-axis-title: #94a3b8;
+  --chart-axis-ticks: #64748b; --chart-grid: rgba(148,163,184,0.1);
+  --shadow: rgba(0,0,0,0.32); --drag-overlay: rgba(139,92,246,0.88);
+  --white-ref-bg: rgba(14,165,233,0.12); --white-ref-border: rgba(14,165,233,0.28);
+  --white-ref-text: #7dd3fc; --white-ref-icon: #38bdf8;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%;overflow:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',sans-serif;
+  background:linear-gradient(135deg,var(--bg-start) 0,var(--bg-mid) 50%,var(--bg-end) 100%);
+  display:flex;flex-direction:column;color:var(--text-primary);
+  transition:background 0.3s ease,color 0.3s ease;
+}
+body.drag-active::before{
+  content:'Drop Spectra Files';position:fixed;inset:0;
+  background:var(--drag-overlay);backdrop-filter:blur(20px);
+  color:white;display:flex;align-items:center;justify-content:center;
+  font-size:2.8em;font-weight:300;letter-spacing:-0.02em;z-index:10000;pointer-events:none;
+}
+.header{
+  background:var(--header-bg);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--header-border);
+  padding:14px 26px;flex-shrink:0;
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  transition:all 0.3s ease;
+}
+.header-left{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+h1{font-size:1.35em;font-weight:600;letter-spacing:-0.02em;white-space:nowrap}
+.white-ref-zone{
+  display:flex;align-items:center;gap:9px;
+  background:var(--white-ref-bg);border:1px solid var(--white-ref-border);
+  border-radius:10px;padding:7px 13px;cursor:pointer;
+  transition:all 0.25s ease;flex-shrink:0;
+}
+.white-ref-zone:hover{filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 12px var(--shadow)}
+.white-ref-label{font-size:0.78em;font-weight:600;color:var(--white-ref-text);white-space:nowrap}
+.white-ref-status{font-size:0.72em;color:var(--text-tertiary);white-space:nowrap}
+.white-ref-icon-wrap{font-size:1.2em;color:var(--white-ref-icon);line-height:1}
+.theme-toggle-wrapper{display:flex;align-items:center;flex-shrink:0}
+.theme-toggle-wrapper label{
+  position:relative;display:block;width:54px;height:28px;
+  border-radius:28px;background:#000839;overflow:hidden;cursor:pointer;
+  transition:background-color 0.3s ease;
+}
+.theme-toggle-wrapper label::before,.theme-toggle-wrapper label::after{
+  display:block;position:absolute;content:'';
+  width:20px;height:20px;border-radius:50%;top:4px;left:4px;transition:0.5s ease;
+}
+.theme-toggle-wrapper label::before{background:#ffa41b}
+.theme-toggle-wrapper label::after{background:#000839;left:-20px;transform:scale(0.00001)}
+.theme-toggle-wrapper input[type=checkbox]{display:none}
+.theme-toggle-wrapper input[type=checkbox]:checked ~ label::before{background:#FFF;transform:translateX(26px)}
+.theme-toggle-wrapper input[type=checkbox]:checked ~ label::after{transform:translateX(40px) scale(1)}
+.loading{
+  display:none;padding:9px;text-align:center;
+  background:var(--loading-bg);border-bottom:1px solid var(--loading-border);
+  color:var(--loading-text);font-size:0.8em;font-weight:500;
+}
+.loading.active{display:block}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.spinner{
+  display:inline-block;width:12px;height:12px;
+  border:2px solid rgba(167,139,250,0.3);border-radius:50%;
+  border-top-color:#a78bfa;animation:spin 0.8s linear infinite;margin-right:6px;
+}
+.main-container{display:flex;flex:1;overflow:hidden;gap:14px;padding:14px}
+.sidebar{
+  width:248px;background:var(--glass-bg);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:14px;
+  display:flex;flex-direction:column;box-shadow:0 8px 32px var(--shadow);
+  flex-shrink:0;overflow:hidden;transition:all 0.3s ease;
+}
+.sidebar-header{
+  padding:14px 16px;background:var(--sidebar-header-bg);
+  border-bottom:1px solid var(--glass-border);color:var(--sidebar-header-text);
+  font-weight:600;font-size:0.78em;letter-spacing:0.07em;text-transform:uppercase;
+}
+.file-list{flex:1;overflow-y:auto;padding:10px}
+.file-list::-webkit-scrollbar{width:5px}
+.file-list::-webkit-scrollbar-track{background:transparent}
+.file-list::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
+.file-list::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-thumb-hover)}
+.file-item{
+  background:var(--file-item-bg);border:1px solid var(--file-item-border);
+  border-radius:10px;padding:11px 13px;margin-bottom:8px;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.file-item:hover{
+  background:var(--file-item-hover-bg);border-color:var(--file-item-hover-border);
+  transform:translateY(-1px);box-shadow:0 4px 12px var(--shadow);
+}
+.file-name{font-weight:500;color:var(--text-primary);margin-bottom:9px;word-break:break-word;font-size:0.84em}
+.file-controls{display:flex;flex-direction:column;gap:5px}
+.toggle-group{display:flex;align-items:center;gap:6px;font-size:0.76em;color:var(--text-secondary)}
+.toggle-group:hover{color:var(--text-primary)}
+.toggle-checkbox{width:13px;height:13px;cursor:pointer;accent-color:#6366f1}
+.delete-btn{
+  background:var(--delete-btn-bg);border:1px solid var(--delete-btn-border);
+  color:var(--delete-btn-text);border-radius:7px;padding:5px 9px;
+  cursor:pointer;font-size:0.74em;font-weight:500;margin-top:2px;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.delete-btn:hover{background:var(--delete-btn-hover-bg);border-color:var(--delete-btn-hover-border);color:var(--delete-btn-hover-text);transform:translateY(-1px)}
+.empty-state{text-align:center;padding:32px 14px;color:var(--empty-state-text);font-size:0.8em}
+.empty-state-icon{font-size:2.4em;margin-bottom:8px;opacity:0.4}
+.empty-state-text{line-height:1.65}
+.content-area{flex:1;display:flex;flex-direction:column;overflow:hidden;gap:12px;min-width:0}
+.controls{
+  background:var(--glass-bg);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:13px;
+  padding:12px 18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  box-shadow:0 8px 32px var(--shadow);flex-shrink:0;
+}
+.param-group{display:flex;align-items:center;gap:7px}
+.param-group label{font-weight:500;color:var(--text-secondary);font-size:0.8em;white-space:nowrap}
+.param-group input[type=number]{
+  padding:7px 10px;background:var(--input-bg);border:1px solid var(--input-border);
+  border-radius:7px;width:70px;font-size:0.84em;color:var(--text-primary);
+  transition:all 0.25s ease;
+}
+.param-group input[type=number]:focus{outline:none;border-color:var(--input-focus-border);box-shadow:0 0 0 3px var(--input-focus-shadow)}
+.ctrl-divider{width:1px;height:24px;background:var(--glass-border);flex-shrink:0}
+button{
+  padding:7px 14px;border:none;border-radius:7px;cursor:pointer;
+  font-size:0.8em;font-weight:500;letter-spacing:0.01em;
+  transition:all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+#applyParams{background:var(--apply-btn-bg);border:1px solid var(--apply-btn-border);color:var(--apply-btn-text)}
+#applyParams:hover{background:var(--apply-btn-hover-bg);border-color:var(--apply-btn-hover-border);transform:translateY(-2px);box-shadow:0 4px 14px rgba(34,197,94,0.22)}
+.reset-btn{background:var(--reset-btn-bg);border:1px solid var(--reset-btn-border);color:var(--reset-btn-text)}
+.reset-btn:hover{background:var(--reset-btn-hover-bg);border-color:var(--reset-btn-hover-border);transform:translateY(-2px);box-shadow:0 4px 14px rgba(99,102,241,0.22)}
+button:active{transform:translateY(0)!important}
+.charts-area{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden;min-height:0}
+.chart-panel{
+  flex:1;background:var(--glass-bg);backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:13px;
+  padding:15px 18px 12px;box-shadow:0 8px 32px var(--shadow);
+  display:flex;flex-direction:column;min-height:0;overflow:hidden;
+}
+.chart-panel-title{font-size:0.76em;font-weight:600;color:var(--text-secondary);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:7px;flex-shrink:0}
+.chart-canvas-wrap{flex:1;position:relative;min-height:0}
+.chart-canvas-wrap canvas{cursor:crosshair}
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>Absorption Spectra Analyzer</h1>
-        <div class="theme-toggle-wrapper">		
-            <input type="checkbox" id="toggle"/>
-            <label for="toggle"></label>
-        </div>
+
+<div class="header">
+  <div class="header-left">
+    <h1>NIR Spectra Analyzer</h1>
+    <div class="white-ref-zone" id="whiteRefZone" title="Click to upload white reference file">
+      <span class="white-ref-icon-wrap">⬜</span>
+      <div>
+        <div class="white-ref-label">White Reference</div>
+        <div class="white-ref-status" id="whiteRefStatus">Not loaded — click to upload</div>
+      </div>
+    </div>
+  </div>
+  <div class="theme-toggle-wrapper">
+    <input type="checkbox" id="toggle">
+    <label for="toggle"></label>
+  </div>
+</div>
+
+<div class="loading" id="loading"><span class="spinner"></span>Processing…</div>
+
+<div class="main-container">
+  <div class="sidebar">
+    <div class="sidebar-header">Spectra Library</div>
+    <div class="file-list" id="fileList">
+      <div class="empty-state">
+        <div class="empty-state-icon">📂</div>
+        <div class="empty-state-text">Drop sample files anywhere<br>to begin analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="controls">
+      <div class="param-group">
+        <label for="winR">Reflectance Window</label>
+        <input type="number" id="winR" value="31" min="3" step="2">
+      </div>
+      <div class="param-group">
+        <label for="winA">Absorbance Window</label>
+        <input type="number" id="winA" value="101" min="3" step="2">
+      </div>
+      <div class="param-group">
+        <label for="polyOrder">Poly Order</label>
+        <input type="number" id="polyOrder" value="3" min="1" max="5">
+      </div>
+      <div class="ctrl-divider"></div>
+      <button id="applyParams">Apply</button>
+      <button class="reset-btn" id="resetZoomR">Reset Reflectance</button>
+      <button class="reset-btn" id="resetZoomA">Reset Absorbance</button>
     </div>
 
-    <div class="loading" id="loading">
-        <span class="spinner"></span>Processing files...
+    <div class="charts-area">
+      <div class="chart-panel">
+        <div class="chart-panel-title">Reflectance — (I_sample − I_white) / I_white · Savitzky-Golay smoothed</div>
+        <div class="chart-canvas-wrap"><canvas id="chartR"></canvas></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-panel-title">Absorbance — −log₁₀(R_raw − min(R_raw) + ε) · Savitzky-Golay smoothed</div>
+        <div class="chart-canvas-wrap"><canvas id="chartA"></canvas></div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="main-container">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                Spectra Library
-            </div>
-            <div class="file-list" id="fileList">
-                <div class="empty-state">
-                    <div class="empty-state-icon">📊</div>
-                    <div class="empty-state-text">Drop files anywhere<br>to begin analysis</div>
-                </div>
-            </div>
-        </div>
+<input type="file" id="fileElemSamples" multiple accept=".xlsx,.xls,.csv" style="display:none">
+<input type="file" id="fileElemWhite" accept=".xlsx,.xls,.csv" style="display:none">
 
-        <div class="content-area">
-            <div class="controls">
-                <div class="param-group">
-                    <label for="windowLength">Window</label>
-                    <input type="number" id="windowLength" value="11" min="3" step="2"> 
-                </div>
-                
-                <div class="param-group">
-                    <label for="polyOrder">Poly Order</label>
-                    <input type="number" id="polyOrder" value="2" min="1" max="5">
-                </div>
-                
-                <button id="applyParams">Apply</button>
-                <button id="resetZoom">Reset View</button>
-            </div>
+<script>
+// Theme
+const themeToggle = document.getElementById('toggle');
+const body = document.body;
+if ((localStorage.getItem('theme') || 'light') === 'dark') {
+  body.classList.add('dark-theme'); themeToggle.checked = true;
+}
+themeToggle.addEventListener('change', () => {
+  body.classList.toggle('dark-theme', themeToggle.checked);
+  localStorage.setItem('theme', themeToggle.checked ? 'dark' : 'light');
+  updateChartTheme(chartR); updateChartTheme(chartA);
+});
 
-            <div id="chart-container">
-                <canvas id="myChart"></canvas>
-            </div>
-        </div>
-    </div>
+// State
+let whiteRef = null;
+let loadedFiles = [];
+let chartR = null, chartA = null;
 
-    <input type="file" id="fileElem" multiple accept=".xlsx, .xls, .csv" style="display: none;">
+// DOM
+const fileList = document.getElementById('fileList');
+const loading = document.getElementById('loading');
+const whiteRefZone = document.getElementById('whiteRefZone');
+const whiteRefStatus = document.getElementById('whiteRefStatus');
+const winR = document.getElementById('winR');
+const winA = document.getElementById('winA');
+const polyOrder = document.getElementById('polyOrder');
+const fileElemSamples = document.getElementById('fileElemSamples');
+const fileElemWhite = document.getElementById('fileElemWhite');
 
-    <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('toggle');
-        const body = document.body;
+// White ref upload
+whiteRefZone.addEventListener('click', () => fileElemWhite.click());
+fileElemWhite.addEventListener('change', async (e) => {
+  if (!e.target.files.length) return;
+  loading.classList.add('active');
+  try {
+    const d = await parseFile(e.target.files[0]);
+    whiteRef = d;
+    whiteRefStatus.textContent = e.target.files[0].name.replace(/\.[^.]+$/, '');
+    processAndRender();
+  } catch(err) { alert('Error reading white reference: ' + err.message); }
+  finally { loading.classList.remove('active'); fileElemWhite.value = ''; }
+});
 
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            body.classList.add('dark-theme');
-            themeToggle.checked = true;
-        }
+// Sample upload
+fileList.addEventListener('click', (e) => { if (!e.target.closest('.file-item')) fileElemSamples.click(); });
+fileElemSamples.addEventListener('change', (e) => { loadSamples(e.target.files); fileElemSamples.value = ''; });
 
-        themeToggle.addEventListener('change', function() {
-            if (this.checked) {
-                body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark-theme');
-                localStorage.setItem('theme', 'light');
-            }
-            
-            // Update chart colors if chart exists
-            if (myChart) {
-                updateChartTheme();
-            }
-        });
+// Drag & drop
+let dragCtr = 0;
+['dragenter','dragover','dragleave','drop'].forEach(n =>
+  document.body.addEventListener(n, e => { e.preventDefault(); e.stopPropagation(); }));
+document.body.addEventListener('dragenter', () => { dragCtr++; body.classList.add('drag-active'); });
+document.body.addEventListener('dragleave', () => { if (--dragCtr <= 0) { dragCtr = 0; body.classList.remove('drag-active'); } });
+document.body.addEventListener('drop', (e) => { dragCtr = 0; body.classList.remove('drag-active'); loadSamples(e.dataTransfer.files); });
 
-        const fileElem = document.getElementById('fileElem');
-        const fileListContainer = document.getElementById('fileList');
-        const resetZoomButton = document.getElementById('resetZoom');
-        const windowLengthInput = document.getElementById('windowLength');
-        const polyOrderInput = document.getElementById('polyOrder');
-        const applyParamsButton = document.getElementById('applyParams');
-        const loadingIndicator = document.getElementById('loading');
-        let myChart;
-        let loadedFilesData = [];
+// Controls
+document.getElementById('applyParams').addEventListener('click', () => { if (loadedFiles.length) processAndRender(); });
+document.getElementById('resetZoomR').addEventListener('click', () => chartR && chartR.resetZoom());
+document.getElementById('resetZoomA').addEventListener('click', () => chartA && chartA.resetZoom());
 
-        // Contrasting colors - cool colors for originals, highly contrasting warm colors for absorbance
-        const ORIGINAL_SPECTRUM_COLORS = [
-            'rgba(59, 130, 246, 0.6)',   // Blue
-            'rgba(139, 92, 246, 0.6)',   // Purple
-            'rgba(14, 165, 233, 0.6)',   // Sky Blue
-            'rgba(168, 85, 247, 0.6)',   // Violet
-            'rgba(6, 182, 212, 0.6)',    // Cyan
-            'rgba(99, 102, 241, 0.6)',   // Indigo
-            'rgba(79, 70, 229, 0.6)',    // Deep Blue
-            'rgba(147, 51, 234, 0.6)',   // Purple
-            'rgba(37, 99, 235, 0.6)'     // Royal Blue
-        ];
-
-        // High contrast colors for absorbance - each very different from the others
-        const PROCESSED_SPECTRUM_COLORS = [
-            'rgba(239, 68, 68, 0.9)',      // Bright Red
-            'rgba(34, 197, 94, 0.9)',      // Bright Green
-            'rgba(234, 179, 8, 0.9)',      // Golden Yellow
-            'rgba(236, 72, 153, 0.9)',     // Hot Pink
-            'rgba(249, 115, 22, 0.9)',     // Deep Orange
-            'rgba(20, 184, 166, 0.9)',     // Teal
-            'rgba(168, 85, 247, 0.9)',     // Purple
-            'rgba(132, 204, 22, 0.9)',     // Lime Green
-            'rgba(14, 165, 233, 0.9)'      // Sky Blue
-        ];
-
-        // Global drag and drop events
-        let dragCounter = 0;
-
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-
-        document.body.addEventListener('dragenter', (e) => {
-            dragCounter++;
-            document.body.classList.add('drag-active');
-        }, false);
-
-        document.body.addEventListener('dragleave', (e) => {
-            dragCounter--;
-            if (dragCounter === 0) {
-                document.body.classList.remove('drag-active');
-            }
-        }, false);
-
-        document.body.addEventListener('drop', (e) => {
-            dragCounter = 0;
-            document.body.classList.remove('drag-active');
-            handleDrop(e);
-        }, false);
-
-        fileListContainer.addEventListener('click', (e) => {
-            if (e.target.closest('.file-item')) return;
-            fileElem.click();
-        }, false);
-
-        fileElem.addEventListener('change', (event) => loadAndProcessFiles(event.target.files), false);
-
-        resetZoomButton.addEventListener('click', () => {
-            if (myChart) {
-                myChart.resetZoom();
-            }
-        });
-
-        applyParamsButton.addEventListener('click', () => {
-            if (loadedFilesData.length > 0) {
-                processAndRenderAllFiles();
-            } else {
-                alert("Please load files first before applying parameters.");
-            }
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        function handleDrop(e) {
-            let dt = e.dataTransfer;
-            let files = dt.files;
-            loadAndProcessFiles(files);
-        }
-
-        async function loadAndProcessFiles(files) {
-            loadingIndicator.classList.add('active');
-            
-            try {
-                for (const file of files) {
-                    const fileExtension = file.name.split('.').pop().toLowerCase();
-                    let wavelength = [];
-                    let intensity = [];
-                    let filenameWithoutExt = file.name.replace(/\.(xlsx|xls|csv)$/i, "");
-
-                    // Check if file already exists
-                    if (loadedFilesData.find(f => f.name === filenameWithoutExt)) {
-                        console.log(`File ${filenameWithoutExt} already loaded, skipping.`);
-                        continue;
-                    }
-
-                    if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-                        const data = await readFileAsync(file, 'binary');
-                        const workbook = XLSX.read(data, { type: 'binary' });
-                        const sheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[sheetName];
-                        const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-                        for (let i = 1; i < json.length; i++) {
-                            const w = parseFloat(json[i][0]);
-                            const int = parseFloat(json[i][1]);
-                            if (!isNaN(w) && !isNaN(int)) {
-                                wavelength.push(w);
-                                intensity.push(int);
-                            }
-                        }
-
-                    } else if (fileExtension === 'csv') {
-                        const text = await readFileAsync(file, 'text');
-                        const lines = text.split('\n');
-                        const dataRows = lines.filter(line => !line.startsWith('#') && line.trim() !== '');
-                        
-                        if (dataRows.length > 1) {
-                            const headers = dataRows[0].split(',').map(h => h.trim().toLowerCase());
-                            const wavelengthColIndex = headers.indexOf('wavelength');
-                            const intensityColIndex = headers.indexOf('intensity');
-
-                            if (wavelengthColIndex === -1 || intensityColIndex === -1) {
-                                alert(`CSV file ${file.name} must contain 'wavelength' and 'intensity' columns.`);
-                                continue;
-                            }
-
-                            for (let i = 1; i < dataRows.length; i++) {
-                                const values = dataRows[i].split(',');
-                                const w = parseFloat(values[wavelengthColIndex]);
-                                const int = parseFloat(values[intensityColIndex]);
-                                if (!isNaN(w) && !isNaN(int)) {
-                                    wavelength.push(w);
-                                    intensity.push(int);
-                                }
-                            }
-                        } else {
-                            console.warn(`Skipping file ${file.name}: CSV file is empty or only contains comments.`);
-                            continue;
-                        }
-                    } else {
-                        console.warn(`Skipping file ${file.name}: Not a supported file type.`);
-                        continue;
-                    }
-
-                    if (wavelength.length > 0 && intensity.length > 0) {
-                        loadedFilesData.push({
-                            name: filenameWithoutExt,
-                            wavelength: wavelength,
-                            intensity: intensity,
-                            showOriginal: true,
-                            showAbsorbance: true
-                        });
-                    } else {
-                        console.warn(`Skipping file ${file.name}: No valid numeric data found.`);
-                    }
-                }
-
-                updateFileList();
-                processAndRenderAllFiles();
-            } catch (error) {
-                console.error("Error processing files:", error);
-                alert("An error occurred while processing files. Please check the console for details.");
-            } finally {
-                loadingIndicator.classList.remove('active');
-            }
-        }
-
-        function updateFileList() {
-            if (loadedFilesData.length === 0) {
-                fileListContainer.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📊</div>
-                        <div class="empty-state-text">Drop files anywhere<br>to begin analysis</div>
-                    </div>
-                `;
-                return;
-            }
-
-            fileListContainer.innerHTML = '';
-            
-            loadedFilesData.forEach((fileData, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <div class="file-name">${fileData.name}</div>
-                    <div class="file-controls">
-                        <div class="toggle-group">
-                            <input type="checkbox" class="toggle-checkbox" id="show-original-${index}" ${fileData.showOriginal ? 'checked' : ''}>
-                            <label for="show-original-${index}">Original</label>
-                        </div>
-                        <div class="toggle-group">
-                            <input type="checkbox" class="toggle-checkbox" id="show-absorbance-${index}" ${fileData.showAbsorbance ? 'checked' : ''}>
-                            <label for="show-absorbance-${index}">Absorbance</label>
-                        </div>
-                        <button class="delete-btn" data-index="${index}">Remove</button>
-                    </div>
-                `;
-
-                fileItem.querySelector(`#show-original-${index}`).addEventListener('change', (e) => {
-                    fileData.showOriginal = e.target.checked;
-                    processAndRenderAllFiles();
-                });
-
-                fileItem.querySelector(`#show-absorbance-${index}`).addEventListener('change', (e) => {
-                    fileData.showAbsorbance = e.target.checked;
-                    processAndRenderAllFiles();
-                });
-
-                fileItem.querySelector('.delete-btn').addEventListener('click', () => {
-                    loadedFilesData.splice(index, 1);
-                    updateFileList();
-                    processAndRenderAllFiles();
-                });
-
-                fileListContainer.appendChild(fileItem);
-            });
-        }
-
-        function getChartColors() {
-            const isDark = body.classList.contains('dark-theme');
-            return {
-                legendText: isDark ? '#cbd5e1' : '#475569',
-                tooltipBg: isDark ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-                tooltipBorder: isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(99, 102, 241, 0.2)',
-                tooltipTitle: isDark ? '#e2e8f0' : '#1e293b',
-                tooltipBody: isDark ? '#cbd5e1' : '#475569',
-                axisTitle: isDark ? '#94a3b8' : '#64748b',
-                axisTicks: isDark ? '#64748b' : '#94a3b8',
-                grid: isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(99, 102, 241, 0.1)'
-            };
-        }
-
-        function updateChartTheme() {
-            if (!myChart) return;
-            
-            const colors = getChartColors();
-            
-            myChart.options.plugins.legend.labels.color = colors.legendText;
-            myChart.options.plugins.tooltip.backgroundColor = colors.tooltipBg;
-            myChart.options.plugins.tooltip.borderColor = colors.tooltipBorder;
-            myChart.options.plugins.tooltip.titleColor = colors.tooltipTitle;
-            myChart.options.plugins.tooltip.bodyColor = colors.tooltipBody;
-            
-            myChart.options.scales.x.title.color = colors.axisTitle;
-            myChart.options.scales.x.ticks.color = colors.axisTicks;
-            myChart.options.scales.x.grid.color = colors.grid;
-            
-            myChart.options.scales.y.title.color = colors.axisTitle;
-            myChart.options.scales.y.ticks.color = colors.axisTicks;
-            myChart.options.scales.y.grid.color = colors.grid;
-            
-            myChart.options.scales.y1.title.color = colors.axisTitle;
-            myChart.options.scales.y1.ticks.color = colors.axisTicks;
-            
-            myChart.update();
-        }
-
-        function processAndRenderAllFiles() {
-            const allDatasets = [];
-            let colorIndex = 0;
-
-            const windowLength = parseInt(windowLengthInput.value);
-            const polyOrder = parseInt(polyOrderInput.value);
-
-            if (isNaN(windowLength) || windowLength < 3) {
-                alert("Window Length must be a number greater than or equal to 3.");
-                return;
-            }
-            
-            if (windowLength % 2 === 0) {
-                alert("Window Length must be an odd number. Adjusting to " + (windowLength + 1));
-                windowLengthInput.value = windowLength + 1;
-                return;
-            }
-            
-            if (isNaN(polyOrder) || polyOrder < 1 || polyOrder > 5) {
-                alert("Polynomial Order must be between 1 and 5.");
-                return;
-            }
-            
-            if (polyOrder >= windowLength) {
-                alert("Polynomial Order must be less than Window Length.");
-                return;
-            }
-
-            for (const fileData of loadedFilesData) {
-                const { name, wavelength, intensity, showOriginal, showAbsorbance } = fileData;
-                
-                if (showOriginal) {
-                    allDatasets.push({
-                        label: `${name} (Original)`,
-                        data: intensity.map((val, i) => ({ x: wavelength[i], y: val })),
-                        borderColor: ORIGINAL_SPECTRUM_COLORS[colorIndex % ORIGINAL_SPECTRUM_COLORS.length],
-                        backgroundColor: ORIGINAL_SPECTRUM_COLORS[colorIndex % ORIGINAL_SPECTRUM_COLORS.length].replace('0.6)', '0.1)'),
-                        borderWidth: 1.5,
-                        fill: false,
-                        pointRadius: 0,
-                        pointHoverRadius: 3,
-                        yAxisID: 'y',
-                        tension: 0.1
-                    });
-                }
-
-                if (showAbsorbance) {
-                    const processedData = processSpectrum(wavelength, intensity, windowLength, polyOrder);
-                    allDatasets.push({
-                        label: `${name} (Absorbance)`,
-                        data: processedData.map((val, i) => ({ x: wavelength[i], y: val })),
-                        borderColor: PROCESSED_SPECTRUM_COLORS[colorIndex % PROCESSED_SPECTRUM_COLORS.length],
-                        borderWidth: 2.5,
-                        fill: false,
-                        pointRadius: 0,
-                        pointHoverRadius: 4,
-                        yAxisID: 'y1',
-                        tension: 0.2
-                    });
-                }
-                
-                colorIndex++;
-            }
-
-            if (allDatasets.length > 0) {
-                renderChart(allDatasets);
-            } else {
-                if (myChart) {
-                    myChart.destroy();
-                    myChart = null;
-                }
-            }
-        }
-
-        function readFileAsync(file, type) {
-            return new Promise((resolve, reject) => {
-                let reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                if (type === 'binary') {
-                    reader.readAsBinaryString(file);
-                } else if (type === 'text') {
-                    reader.readAsText(file);
-                }
-            });
-        }
-
-        function savgol_filter(data, window_length, polyorder) {
-            if (window_length % 2 === 0) window_length += 1;
-            if (window_length > data.length) {
-                window_length = data.length % 2 === 0 ? data.length - 1 : data.length;
-            }
-            if (window_length < 3) window_length = 3;
-
-            const half_window = Math.floor(window_length / 2);
-            const smoothed_data = Array(data.length).fill(0);
-
-            for (let i = 0; i < data.length; i++) {
-                let sum = 0;
-                let weight_sum = 0;
-                
-                for (let j = -half_window; j <= half_window; j++) {
-                    if (i + j >= 0 && i + j < data.length) {
-                        const weight = Math.exp(-(j * j) / (2 * (half_window / 2) ** 2));
-                        sum += data[i + j] * weight;
-                        weight_sum += weight;
-                    }
-                }
-                smoothed_data[i] = sum / weight_sum;
-            }
-            
-            return smoothed_data;
-        }
-
-        function processSpectrum(wavelength, intensity, window_length, polyorder) {
-            const numericIntensity = intensity.map(Number);
-            const smoothed = savgol_filter(numericIntensity, window_length, polyorder);
-            const baseline_corrected = smoothed.map(val => val - Math.min(...smoothed));
-
-            const derivative = baseline_corrected.map((val, i, arr) => {
-                if (i === 0) return 0;
-                return val - arr[i - 1];
-            });
-
-            const minDerivative = Math.min(...derivative);
-            const maxDerivative = Math.max(...derivative);
-            const range = maxDerivative - minDerivative;
-
-            const normalized = derivative.map(val =>
-                range === 0 ? 0 : (val - minDerivative) / range
-            );
-
-            const absorption = normalized.map(val => -Math.log10(Math.max(val, 1e-6)));
-
-            return absorption;
-        }
-
-        function renderChart(datasets) {
-            const ctx = document.getElementById('myChart').getContext('2d');
-            const colors = getChartColors();
-
-            if (myChart) {
-                myChart.destroy();
-            }
-
-            myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: {
-                        duration: 400,
-                        easing: 'easeInOutQuart'
-                    },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    },
-                    plugins: {
-                        title: {
-                            display: false
-                        },
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                padding: 16,
-                                font: {
-                                    size: 11,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
-                                    weight: '500'
-                                },
-                                color: colors.legendText,
-                                usePointStyle: true,
-                                boxWidth: 8,
-                                boxHeight: 8
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: colors.tooltipBg,
-                            backdropFilter: 'blur(10px)',
-                            padding: 12,
-                            titleFont: {
-                                size: 12,
-                                family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
-                                weight: '600'
-                            },
-                            bodyFont: {
-                                size: 11,
-                                family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
-                            },
-                            titleColor: colors.tooltipTitle,
-                            bodyColor: colors.tooltipBody,
-                            borderColor: colors.tooltipBorder,
-                            borderWidth: 1,
-                            cornerRadius: 8,
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.parsed.y !== null) {
-                                        label += context.parsed.y.toFixed(4);
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        zoom: {
-    pan: {
-        enabled: true,
-        mode: 'xy',
-        threshold: 5
-    },
-    zoom: {
-        wheel: {
-            enabled: true,
-            speed: 0.1
-        },
-        pinch: {
-            enabled: true
-        },
-        mode: 'xy'
-    }
+// File reader helper
+function readAsync(file, type) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    type === 'binary' ? r.readAsBinaryString(file) : r.readAsText(file);
+  });
 }
 
-                    },
-                    scales: {
-                        x: {
-                            type: 'linear',
-                            title: {
-                                display: true,
-                                text: 'Wavelength (nm)',
-                                font: {
-                                    size: 12,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
-                                    weight: '500'
-                                },
-                                color: colors.axisTitle
-                            },
-                            grid: {
-                                color: colors.grid,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 10,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
-                                },
-                                color: colors.axisTicks
-                            }
-                        },
-                        y: {
-                            type: 'linear',
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Intensity (a.u.)',
-                                font: {
-                                    size: 12,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
-                                    weight: '500'
-                                },
-                                color: colors.axisTitle
-                            },
-                            grid: {
-                                color: colors.grid,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 10,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
-                                },
-                                color: colors.axisTicks
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Absorbance (a.u.)',
-                                font: {
-                                    size: 12,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif',
-                                    weight: '500'
-                                },
-                                color: colors.axisTitle
-                            },
-                            grid: {
-                                drawOnChartArea: false,
-                                drawBorder: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 10,
-                                    family: '-apple-system, BlinkMacSystemFont, SF Pro Display, Segoe UI, sans-serif'
-                                },
-                                color: colors.axisTicks,
-                                callback: function(value) {
-                                    return value.toFixed(2);
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-    </script>
+// Parse xlsx/csv -> { wavelength: Float64Array, intensity: Float64Array }
+async function parseFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const w = [], v = [];
+  if (ext === 'xlsx' || ext === 'xls') {
+    const data = await readAsync(file, 'binary');
+    const wb = XLSX.read(data, { type: 'binary' });
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1 });
+    for (let i = 1; i < rows.length; i++) {
+      const wi = parseFloat(rows[i][0]), vi = parseFloat(rows[i][1]);
+      if (!isNaN(wi) && !isNaN(vi)) { w.push(wi); v.push(vi); }
+    }
+  } else if (ext === 'csv') {
+    const text = await readAsync(file, 'text');
+    const lines = text.split('\n').filter(l => !l.startsWith('#') && l.trim());
+    if (lines.length > 1) {
+      const hdrs = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const wi2 = hdrs.indexOf('wavelength'), vi2 = hdrs.indexOf('intensity');
+      for (let i = 1; i < lines.length; i++) {
+        const p = lines[i].split(',');
+        const wv = parseFloat(p[wi2 >= 0 ? wi2 : 0]);
+        const vv = parseFloat(p[vi2 >= 0 ? vi2 : 1]);
+        if (!isNaN(wv) && !isNaN(vv)) { w.push(wv); v.push(vv); }
+      }
+    }
+  }
+  if (w.length === 0) throw new Error('No numeric data found');
+  return { wavelength: new Float64Array(w), intensity: new Float64Array(v) };
+}
+
+async function loadSamples(files) {
+  loading.classList.add('active');
+  try {
+    for (const f of files) {
+      const name = f.name.replace(/\.[^.]+$/, '');
+      if (loadedFiles.find(x => x.name === name)) continue;
+      const d = await parseFile(f);
+      loadedFiles.push({ name, wavelength: d.wavelength, intensity: d.intensity, showR: true, showA: true });
+    }
+    updateFileList();
+    processAndRender();
+  } catch(err) { alert('Error: ' + err.message); }
+  finally { loading.classList.remove('active'); }
+}
+
+function updateFileList() {
+  if (!loadedFiles.length) {
+    fileList.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">Drop sample files anywhere<br>to begin analysis</div></div>`;
+    return;
+  }
+  fileList.innerHTML = '';
+  loadedFiles.forEach((fd, i) => {
+    const el = document.createElement('div');
+    el.className = 'file-item';
+    el.innerHTML = `<div class="file-name">${fd.name}</div>
+      <div class="file-controls">
+        <div class="toggle-group"><input type="checkbox" class="toggle-checkbox" id="sr${i}" ${fd.showR?'checked':''}><label for="sr${i}">Reflectance</label></div>
+        <div class="toggle-group"><input type="checkbox" class="toggle-checkbox" id="sa${i}" ${fd.showA?'checked':''}><label for="sa${i}">Absorbance</label></div>
+        <button class="delete-btn" data-i="${i}">Remove</button>
+      </div>`;
+    el.querySelector(`#sr${i}`).addEventListener('change', e => { fd.showR = e.target.checked; processAndRender(); });
+    el.querySelector(`#sa${i}`).addEventListener('change', e => { fd.showA = e.target.checked; processAndRender(); });
+    el.querySelector('.delete-btn').addEventListener('click', () => { loadedFiles.splice(i, 1); updateFileList(); processAndRender(); });
+    fileList.appendChild(el);
+  });
+}
+
+// Linear interpolation
+function interp(xA, yA, x) {
+  if (x <= xA[0]) return yA[0];
+  if (x >= xA[xA.length-1]) return yA[yA.length-1];
+  let lo = 0, hi = xA.length - 1;
+  while (hi - lo > 1) { const m = (lo+hi)>>1; xA[m] <= x ? lo = m : hi = m; }
+  return yA[lo] + (x - xA[lo]) / (xA[hi] - xA[lo]) * (yA[hi] - yA[lo]);
+}
+
+// Savitzky-Golay (Gaussian-weighted approximation)
+function savgol(data, wl, _poly) {
+  let w = wl % 2 === 0 ? wl + 1 : wl;
+  if (w > data.length) w = data.length % 2 === 0 ? data.length - 1 : data.length;
+  if (w < 3) w = 3;
+  const hw = Math.floor(w / 2);
+  const out = new Float64Array(data.length);
+  for (let i = 0; i < data.length; i++) {
+    let s = 0, ws = 0;
+    for (let j = -hw; j <= hw; j++) {
+      const idx = i + j;
+      if (idx >= 0 && idx < data.length) {
+        const weight = Math.exp(-(j*j) / (2 * hw * hw * 0.5));
+        s += data[idx] * weight; ws += weight;
+      }
+    }
+    out[i] = s / ws;
+  }
+  return out;
+}
+
+// Core processing — exact translation of Python script
+function processSpectrum(wS, iS, wW, iW, wLenR, wLenA, poly) {
+  // Interpolate white ref to sample wavelengths if needed
+  const equal = wS.length === wW.length && wS.every((v, i) => v === wW[i]);
+  const iWi = equal ? iW : Float64Array.from(wS, x => interp(wW, iW, x));
+
+  // R_raw = (I_sample - I_white) / I_white
+  const rRaw = new Float64Array(wS.length);
+  for (let i = 0; i < wS.length; i++) rRaw[i] = (iS[i] - iWi[i]) / iWi[i];
+  const rSmooth = savgol(rRaw, wLenR, poly);
+
+  // A = -log10(R_raw - min(R_raw) + 1e-6)
+  let minR = Infinity;
+  for (let i = 0; i < rRaw.length; i++) if (rRaw[i] < minR) minR = rRaw[i];
+  const aRaw = new Float64Array(rRaw.length);
+  for (let i = 0; i < rRaw.length; i++) aRaw[i] = -Math.log10(rRaw[i] - minR + 1e-6);
+  const aSmooth = savgol(aRaw, wLenA, poly);
+
+  return { rSmooth, aSmooth };
+}
+
+const COLORS_R = ['#3b82f6','#8b5cf6','#0ea5e9','#a855f7','#06b6d4','#6366f1','#4f46e5','#9333ea','#2563eb','#7c3aed'];
+const COLORS_A = ['#ef4444','#22c55e','#eab308','#ec4899','#f97316','#14b8a6','#a855f7','#84cc16','#0ea5e9','#f43f5e'];
+
+function gc() {
+  const d = body.classList.contains('dark-theme');
+  return {
+    legend: d?'#cbd5e1':'#475569', tooltipBg: d?'rgba(15,23,42,0.92)':'rgba(255,255,255,0.95)',
+    tooltipBorder: d?'rgba(148,163,184,0.2)':'rgba(99,102,241,0.2)',
+    tooltipTitle: d?'#e2e8f0':'#1e293b', tooltipBody: d?'#cbd5e1':'#475569',
+    axisTitle: d?'#94a3b8':'#64748b', axisTicks: d?'#64748b':'#94a3b8',
+    grid: d?'rgba(148,163,184,0.1)':'rgba(99,102,241,0.1)',
+  };
+}
+
+function updateChartTheme(c) {
+  if (!c) return;
+  const col = gc();
+  c.options.plugins.legend.labels.color = col.legend;
+  c.options.plugins.tooltip.backgroundColor = col.tooltipBg;
+  c.options.plugins.tooltip.borderColor = col.tooltipBorder;
+  c.options.plugins.tooltip.titleColor = col.tooltipTitle;
+  c.options.plugins.tooltip.bodyColor = col.tooltipBody;
+  c.options.scales.x.title.color = col.axisTitle;
+  c.options.scales.x.ticks.color = col.axisTicks;
+  c.options.scales.x.grid.color = col.grid;
+  c.options.scales.y.title.color = col.axisTitle;
+  c.options.scales.y.ticks.color = col.axisTicks;
+  c.options.scales.y.grid.color = col.grid;
+  c.update();
+}
+
+function makeOpts(yLabel) {
+  const c = gc();
+  return {
+    responsive: true, maintainAspectRatio: false,
+    animation: { duration: 320, easing: 'easeInOutQuart' },
+    interaction: { mode: 'nearest', axis: 'x', intersect: false },
+    plugins: {
+      title: { display: false },
+      legend: { display: true, position: 'top', labels: { padding: 14, font: { size: 11, weight: '500' }, color: c.legend, usePointStyle: true, boxWidth: 8, boxHeight: 8 } },
+      tooltip: {
+        backgroundColor: c.tooltipBg, padding: 10,
+        titleFont: { size: 11, weight: '600' }, bodyFont: { size: 10 },
+        titleColor: c.tooltipTitle, bodyColor: c.tooltipBody,
+        borderColor: c.tooltipBorder, borderWidth: 1, cornerRadius: 8,
+        callbacks: { label: ctx => { let l = (ctx.dataset.label || '') + ': '; l += (ctx.parsed.y ?? 0).toFixed(4); return l; } }
+      },
+      zoom: {
+        pan: { enabled: true, mode: 'xy', threshold: 5 },
+        zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, mode: 'xy' }
+      }
+    },
+    scales: {
+      x: {
+        type: 'linear',
+        title: { display: true, text: 'Wavelength (nm)', font: { size: 11, weight: '500' }, color: c.axisTitle },
+        grid: { color: c.grid, drawBorder: false },
+        ticks: { font: { size: 10 }, color: c.axisTicks, callback: v => Number.isInteger(v) ? v : '' }
+      },
+      y: {
+        title: { display: true, text: yLabel, font: { size: 11, weight: '500' }, color: c.axisTitle },
+        grid: { color: c.grid, drawBorder: false },
+        ticks: { font: { size: 10 }, color: c.axisTicks, callback: v => v.toFixed(2) }
+      }
+    }
+  };
+}
+
+function processAndRender() {
+  const wLenR = parseInt(winR.value) || 31;
+  const wLenA = parseInt(winA.value) || 101;
+  const poly  = parseInt(polyOrder.value) || 3;
+  const dsR = [], dsA = [];
+
+  if (whiteRef) {
+    loadedFiles.forEach((fd, ci) => {
+      const { rSmooth, aSmooth } = processSpectrum(
+        fd.wavelength, fd.intensity,
+        whiteRef.wavelength, whiteRef.intensity,
+        wLenR, wLenA, poly
+      );
+      if (fd.showR) {
+        dsR.push({
+          label: fd.name,
+          data: Array.from(fd.wavelength, (w, i) => ({ x: w, y: rSmooth[i] })),
+          borderColor: COLORS_R[ci % COLORS_R.length],
+          borderWidth: 2, fill: false, pointRadius: 0, pointHoverRadius: 3, tension: 0.1
+        });
+      }
+      if (fd.showA) {
+        dsA.push({
+          label: fd.name,
+          data: Array.from(fd.wavelength, (w, i) => ({ x: w, y: aSmooth[i] })),
+          borderColor: COLORS_A[ci % COLORS_A.length],
+          borderWidth: 2, fill: false, pointRadius: 0, pointHoverRadius: 3, tension: 0.1
+        });
+      }
+    });
+  }
+
+  const ctxR = document.getElementById('chartR').getContext('2d');
+  if (chartR) chartR.destroy();
+  chartR = dsR.length ? new Chart(ctxR, { type: 'line', data: { datasets: dsR }, options: makeOpts('Reflectance') }) : null;
+
+  const ctxA = document.getElementById('chartA').getContext('2d');
+  if (chartA) chartA.destroy();
+  chartA = dsA.length ? new Chart(ctxA, { type: 'line', data: { datasets: dsA }, options: makeOpts('Absorbance (A.U.)') }) : null;
+}
+</script>
 </body>
 </html>

@@ -256,7 +256,7 @@ button:active{transform:translateY(0)!important}
 
     <div class="charts-area">
       <div class="chart-panel">
-        <div class="chart-panel-title">Reflectance — (I_sample − I_white) / I_white · Savitzky-Golay smoothed</div>
+        <div class="chart-panel-title">Reflectance — I_sample · Savitzky-Golay smoothed</div>
         <div class="chart-canvas-wrap"><canvas id="chartR"></canvas></div>
       </div>
       <div class="chart-panel">
@@ -436,14 +436,9 @@ function savgol(data, wl, _poly) {
 }
 
 // Core processing — exact translation of Python script
-function processSpectrum(wS, iS, wW, iW, wLenR, wLenA, poly) {
-  // Interpolate white ref to sample wavelengths if needed
-  const equal = wS.length === wW.length && wS.every((v, i) => v === wW[i]);
-  const iWi = equal ? iW : Float64Array.from(wS, x => interp(wW, iW, x));
-
-  // R_raw = (I_sample - I_white) / I_white
-  const rRaw = new Float64Array(wS.length);
-  for (let i = 0; i < wS.length; i++) rRaw[i] = (iS[i] - iWi[i]) / iWi[i];
+function processSpectrum(wS, iS, wLenR, wLenA, poly) {
+  // R_raw = I_sample
+  const rRaw = new Float64Array(iS);
   const rSmooth = savgol(rRaw, wLenR, poly);
 
   // A = -log10(R_raw - min(R_raw) + 1e-6)
@@ -526,11 +521,10 @@ function processAndRender() {
   const poly  = parseInt(polyOrder.value) || 3;
   const dsR = [], dsA = [];
 
-  if (whiteRef) {
+  if (loadedFiles.length) {
     loadedFiles.forEach((fd, ci) => {
       const { rSmooth, aSmooth } = processSpectrum(
         fd.wavelength, fd.intensity,
-        whiteRef.wavelength, whiteRef.intensity,
         wLenR, wLenA, poly
       );
       if (fd.showR) {
